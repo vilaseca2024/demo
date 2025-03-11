@@ -1,0 +1,333 @@
+{% extends 'menu.html' %}
+{% load static %}
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+
+        <h3>Tickets - Solicitudes {% if grupo == 'Administradores' %}<button class="btn btn-round btn-info" data-toggle="modal"
+                data-target=".bs-example-modal-lg">
+                <li class="fa fa-plus"></li> Nuevo Tickets 
+            </button>{% endif %} </h3>
+        <br>
+    </div>
+
+</div>
+<style>
+    .mensaje-truncado {
+    display: inline-block;
+    width: 300px; /* Ajusta el ancho según lo que necesites */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mensaje-completo {
+    display: none;
+}
+
+</style>
+<div class="col-md-12 col-sm-12 ">
+
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listado de Tickets</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
+                            class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>#</th>
+                                    <th>Fecha de Solicitud</th>
+                                    <th>Mensaje</th>
+                                    <th>Adjunto</th>
+                                    <th>Estado</th>
+                                    <th>Usuario Solicitante</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">TICKET<br/>{{ dato.id_ticket }}</td>
+                                    <td>{{ dato.fecha }}</td>
+                                    <td>
+                                        <span class="mensaje-truncado" id="mensaje-{{ dato.id_ticket }}">
+                                            {{ dato.mensaje|truncatechars:50 }} <!-- Limita a 50 caracteres, ajusta según necesidad -->
+                                        </span>
+                                        <a href="javascript:void(0);" class="ver-mas" onclick="mostrarMas('{{ dato.id_ticket }}')">ver más</a>
+                                        <span class="mensaje-completo" id="mensaje-completo-{{ dato.id_ticket }}" style="display:none;">
+                                            {{ dato.mensaje }}
+                                        </span>
+                                    </td>
+                                    
+                                    <td>
+                                        {% if dato.foto %}
+                                        <a href="{{ dato.foto }}"
+                                            target="_blank">
+                                            <span class="badge badge-info" style="font-size: 12px;"  data-toggle="tooltip" data-placement="bottom" title="" 
+                                            data-original-title="Presiona para descargar la Imagen Adjunta a la solicitud">
+                                                <li class="fa fa-eye"></li> Ver Imagen Adjunta
+                                            </span>
+                                        </a>
+                                            
+                                        {% else %}
+                                            Sin Imagen Adjunta
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if dato.estado == False %}
+                                        <a href="#" data-toggle="modal"
+                                            data-target="" >
+                                            <span
+                                                class="badge badge-warning" style="font-size: 12px;">
+                                                <li class="fa fa-clock-o"></li> En Revision
+                                            </span>
+                                        </a>
+                                        {% else %}
+                                        <a href="#" data-toggle="modal"
+                                            data-target="" >
+                                            <span
+                                                class="badge badge-success" style="font-size: 12px;">
+                                                <li class="fa fa-check-square-o"></li> Completado
+                                            </span>
+                                        </a>
+                                        {% endif %}
+                                        
+                                    </td>
+                                   
+                                    <td class="text-center">
+                                        {{dato.usuario.first_name}} {{dato.usuario.last_name}}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm" 
+                                        data-toggle="modal"
+                                        data-target="#info"
+                                        data-id="{{dato.id_ticket}}">
+                                            <li class="fa fa-info-circle"></li> 
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" 
+                                        data-toggle="modal"
+                                        data-target="#completar"
+                                        data-id="{{dato.id_ticket}}">
+                                            <li class="fa fa-check-square-o"></li> 
+                                        </button>
+                                        
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="completar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="completar_ticket" method="POST" id="demo-form6"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Solucionar Ticket</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="diagnostico">Diagnostico</label>
+                            <input type="text" id="diagnostico" name="diagnostico" class="form-control"required>
+                            <input type="hidden" id="ids" name="ids" class="form-control">
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="accion">Accion a tomar</label>
+                            <input type="text" id="accion" name="accion" class="form-control" required>
+                        </div>
+                       
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="correccion">Correccion Realizada</label>
+                            <input type="text" id="correccion" name="correccion" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="recomendacion">Recomendacion</label>
+                            <input type="text" id="recomendacion" name="recomendacion" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="observacion">Observacion</label>
+                            <input type="text" id="observacion" name="observacion" class="form-control" required>
+                        </div>
+                    </div> 
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="info" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Informacion del Empleado</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                           <label for="nombre_empleado_editar"><b>EMPLEADO SOLICITANTE : </b> Juan carlos </label>
+                            
+                            
+                        </div>
+                        <div class="form-group col-md-12">
+                            <b><label for="nombre_equipo_editar">EQUIPOS ASIGNADOS</label></b>
+                            <ul id="equipos-list">
+                                <li></li>
+                                <li></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="form-group col-md-12">
+                            <b><label for="marca_editar">CUENTAS ASIGNADAS</label></b>
+                            <ul id="cuentas-list">
+                                <li></li>
+                                <li></li>
+                            </ul>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <b><label for="marca_editar">CUENTAS DE SISTEMAS INFORMATICOS</label></b>
+                            <ul id="sisinfo-list">
+                          
+                            </ul>
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <b><label for="marca_editar">CUENTAS DE EQUIPOS ASIGNADOS</label></b>
+                            <ul id="perife-list">
+                        
+                            
+                            </ul>
+                        </div>
+
+                       
+                        
+                       
+                    </div>
+
+                    
+                </div>
+
+             
+            </div>
+       
+    </div>
+</div>
+<script>
+    function mostrarMas(ticketId) {
+        var mensajeTruncado = document.getElementById('mensaje-' + ticketId);
+        var mensajeCompleto = document.getElementById('mensaje-completo-' + ticketId);
+        var enlaceVerMas = document.querySelector('a[onclick="mostrarMas(\'' + ticketId + '\')"]');
+
+        // Cambiar el texto y mostrar el mensaje completo
+        mensajeTruncado.style.display = 'none';
+        mensajeCompleto.style.display = 'inline';
+
+        // Cambiar el texto del enlace
+        enlaceVerMas.innerHTML = 'ver menos';
+        enlaceVerMas.setAttribute('onclick', 'mostrarMenos(\'' + ticketId + '\')');
+    }
+
+    function mostrarMenos(ticketId) {
+        var mensajeTruncado = document.getElementById('mensaje-' + ticketId);
+        var mensajeCompleto = document.getElementById('mensaje-completo-' + ticketId);
+        var enlaceVerMas = document.querySelector('a[onclick="mostrarMenos(\'' + ticketId + '\')"]');
+        mensajeTruncado.style.display = 'inline';
+        mensajeCompleto.style.display = 'none';
+        enlaceVerMas.innerHTML = 'ver más';
+        enlaceVerMas.setAttribute('onclick', 'mostrarMas(\'' + ticketId + '\')');
+    }
+
+
+    $('#info').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);  
+    var id_datos = button.data('id');    
+
+    $.ajax({
+        url: '/info_ticket/' + id_datos + '/',  
+        method: 'GET',
+        success: function(data) {
+            $('#info .modal-body').find('label[for="nombre_empleado_editar"]').text("EMPLEADO SOLICITANTE: " + data.empleado);
+            $('#equipos-list').empty();
+            $('#cuentas-list').empty();
+            $('#perife-list').empty();
+            $('#sisinfo-list').empty();
+            data.equipos.forEach(function(equipo) {
+                var li = $('<li>').text(equipo);
+                $('#equipos-list').append(li);
+            });
+            data.cuentas.forEach(function(cuenta) {
+                var li = $('<li>').text(cuenta);
+                $('#cuentas-list').append(li);
+            });
+            data.perifericos.forEach(function(periferico) {
+                var li = $('<li>').text(periferico);
+                $('#perife-list').append(li);
+            });
+            data.sistemas.forEach(function(sistema) {
+                var li = $('<li>').text(sistema);
+                $('#sisinfo-list').append(li);
+            });
+           
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+});
+
+
+$('#completar').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');    
+    $('#ids').val(id_datos);
+});
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends 'menu.html' %}
+{% load static %}
+{% block content %}
+<!-- calendario -->
+<link href="{% static '/FrWork/admin_lte/vendors/fullcalendar/dist/fullcalendar.min.css' %}" rel="stylesheet">
+<link href="{% static '/FrWork/admin_lte/vendors/fullcalendar/dist/fullcalendar.print.css' %}" rel="stylesheet" media="print">
+
+
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Eventos</h3>
+        <br>
+    </div>
+</div>
+
+<style>
+    .fc-title {
+        color: white;
+    }
+</style>
+
+<div class="col-md-12 col-sm-12">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Información de eventos</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <!-- Calendario -->
+            <div id='calendar'></div>
+        </div>
+    </div>
+</div>
+
+<div id="CalenderModalEdit" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel2">Ver Evento</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="testmodal2" style="padding: 5px 20px;">
+                    <form id="antoform2" class="form-horizontal calender" role="form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Evento</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="title2" name="title2">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Descripción</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" style="height:55px;" id="descr2" name="descr2"></textarea>
+                            </div>
+                        </div>
+                        <br/> <br/>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Fecha Inicio</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="start_date2" name="start_date2" readonly>
+                            </div>
+                        </div>
+                        <br/> <br/>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Fecha Fin</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="end_date2" name="end_date2" readonly>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger antoclose2" data-dismiss="modal">Cancelar</button>
+                 
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+    $('.close, .antoclose, .antoclose2').on('click', function() {
+        $(this).closest('.modal').modal('hide');
+    });
+
+    $('#calendar').fullCalendar({
+        locale: 'es',
+        events: '/api/eventos/',
+        editable: true,
+        droppable: true,
+        selectable: true,
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay,listMonth,listWeek,listDay', 
+        },
+        defaultView: 'listWeek',  
+        views: {
+            month: {
+                buttonText: 'Mes'
+            },
+            agendaWeek: {
+                buttonText: 'Semana'
+            },
+            agendaDay: {
+                buttonText: 'Día'
+            },
+            listMonth: {
+                buttonText: 'Info Mes'
+            },
+            listWeek: {
+                buttonText: 'Info Semana'
+            },
+            listDay: {
+                buttonText: 'Info Día'
+            }
+        },
+        eventClick: function(event) {
+            $('#title2').val(event.title);
+            $('#descr2').val(event.descripcion2);
+            $('#start_date2').val(event.start.format('YYYY-MM-DD'));
+            $('#end_date2').val(event.end.format('YYYY-MM-DD'));
+            $('#CalenderModalEdit').modal('show');
+        },
+        events: function(start, end, timezone, callback) {
+            $.ajax({
+                url: '/api/eventos/',
+                dataType: 'json',
+                success: function(data) {
+                    var events = data.map(function(evento) {
+                        return {
+                            id: evento.id,
+                            title: evento.title,
+                            start: evento.start,
+                            end: evento.end,
+                            descripcion2: evento.descripcion2,
+                            color: evento.color,  
+                        };
+                    });
+                    callback(events);  
+                }
+            });
+        },
+    });
+});
+
+</script>
+
+{% endblock %}

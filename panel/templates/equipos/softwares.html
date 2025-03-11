@@ -1,0 +1,460 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+
+
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Sistemas Informaticos <button class="btn btn-round btn-success " data-toggle="modal"
+            data-target=".bs-example-modal-lg"><li class="fa fa-plus"></li> Agregar Nuevo</button></h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Sistemas Informaticos de Oficina</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>#</th>
+                                    <th>Fecha de Modificacion</th>
+                                    <th>Nombre del Sistema</th>
+                                    <th>Puerto</th>
+                                    <th>Direccion IP</th>
+                                    <th>Enlace</th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">{{ dato.id_sistema }}</td>
+                                    <td class="text-center">{{ dato.fecha }}</td>
+                                    <td class="text-center">{{ dato.nombre }}</td>
+                                    <td class="text-center">{{ dato.puerto }} </td>
+                                    <td class="text-center">{{ dato.ip }}</td>
+                                    <td class="text-center">
+                                        <a href="{{ dato.enlace }}" target="_blank">
+                                            {{ dato.enlace }} <li class="fa fa-external-link"></li>
+                                          </a>
+                                    </td>
+                                     
+                                   
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                      
+                                      
+                                        <button class="btn btn-success btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#editModal"
+                                                data-id="{{ dato.id_sistema }}"  >
+                                            <li class="fa fa-edit"></li>  
+                                        </button>
+                                  
+
+                                       
+                                     
+                                        {% if dato.estado == True %}
+                                        
+                                            <button class="btn btn-primary btn-sm" 
+                                                    data-toggle="modal" 
+                                                    data-target="#devolver"
+                                                    data-id="{{ dato.id_equipo }}"  > 
+                                                    <a  
+                                                        data-toggle="tooltip" 
+                                                        data-placement="top" title="" 
+                                                        data-original-title="Presiona para registrar la devolucion del equipo">
+                                                        <li class="fa fa-undo"></li>  
+                                                    </a>
+                                            </button>
+                                       
+                                        {% endif %}
+
+
+                                        {% if dato.activo == 1 %}
+                                            <button class="btn btn-danger btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#eliminar"
+                                            data-id="{{ dato.id_sistema }}"  >
+                                                <li class="fa fa-trash"></li>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-info btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#activar"
+                                            data-id="{{ dato.id_sistema }}"  >
+                                                <li class="fa fa-plus-square-o"></li>
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL PARA AGREGAR  -->
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="agregar_sistema_software" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar nuevo Sistema Informatico</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="nombre_sistema">Nombre Sistema Informatico</label>
+                            <input type="text" id="nombre_sistema" name="nombre_sistema" class="form-control"required>
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            <label for="ip">Direccion IP</label>
+                            <input type="text" id="ip" name="ip" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="puerto">Puerto</label>
+                            <input type="text" id="puerto" name="puerto" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="enlace">Enlace de Acceso</label>
+                            <input type="text" id="enlace" name="enlace" class="form-control" required>
+                        </div>
+                      
+                        <div class="form-group col-md-12">
+                            <label for="descripcion">Descripcion</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- MODAL PARA ASIGNAR EQUIPO A EMPLEADO -->
+<div class="modal fade bs-example-modal-lg-asignar" id="asignar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="asignar_equipo" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Asignar Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="codigo_equipo">Equipo </label>
+                            <input type="text" id="codigo_equipo" name="codigo_equipo" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="marca">Empleado (*)</label>
+                            <select class="selectize" id="empleado_asignado" name="empleado_asignado" required>
+                                <option value="">-------------</option>
+                                {%for usuario in usuarios%}
+                                    <option value="{{usuario.id}}">{{usuario.first_name}} {{usuario.last_name }}</option>
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="asignacion">Fecha de Asignacion (*)</label>
+                            <input type="date" id="asignacion" name="asignacion" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="devolucion">Fecha de Devolucion</label>
+                            <input type="date" id="devolucion" name="devolucion" class="form-control" >
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="detalle">Detalle</label>
+                            <textarea name="detalle" id="detalle" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- MODAL PARA DEVOLVER UN EQUIPO -->
+<div class="modal fade bs-example-modal-lg-asignar" id="devolver" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="devolver_equipo" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Devolucion de Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="codigo_equipo_devolver">Equipo </label>
+                            <input type="text" id="codigo_equipo_devolver" name="codigo_equipo_devolver" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="empleado_devolver">Empleado</label>
+                            <input type="hidden" id="empleado_devolver" name="empleado_devolver" class="form-control" readonly>
+                            <input type="text" id="empleado_devolver_nombre" name="empleado_devolver_nombre" class="form-control" readonly>
+                        </div>
+                    
+                        <div class="form-group col-md-12">
+                            <label for="observacion_devolver">Detalle</label>
+                            <textarea name="observacion_devolver" id="observacion_devolver" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<!-- MODAL PARA EDITAR REGISTRO -->
+<div class="modal fade bs-example-modal-lg" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="editar_sistema_software" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar nuevo Sistema Informatico</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="nombre_sistema_editar">Nombre Sistema Informatico</label>
+                            <input type="text" id="nombre_sistema_editar" name="nombre_sistema_editar" class="form-control"required>
+                            <input type="hidden" id="id_sistema" name="id_sistema" class="form-control"required>
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            <label for="ip_editar">Direccion IP</label>
+                            <input type="text" id="ip_editar" name="ip_editar" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="puerto_editar">Puerto</label>
+                            <input type="text" id="puerto_editar" name="puerto_editar" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="enlace_editar">Enlace de Acceso</label>
+                            <input type="text" id="enlace_editar" name="enlace_editar" class="form-control" required>
+                        </div>
+                      
+                        <div class="form-group col-md-12">
+                            <label for="descripcion_editar">Descripcion</label>
+                            <textarea class="form-control" id="descripcion_editar" name="descripcion_editar" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+                        </div>
+                    </div> 
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="eliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="eliminar_software" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Confirma si deseas desactivar este Software?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_eliminar" id="id_eliminar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Desactivar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="activar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="activar_software" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-plus-square-o"></li>
+                        <h4 class="mt-2">Confirma si deseas Activar este Software?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_activar" id="id_activar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Activar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $('#eliminar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_eliminar').val(id_datos);
+    });
+    $('#activar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_activar').val(id_datos);
+    });
+
+       $(document).ready(function() {
+        $('#empleado_asignado').selectize(); 
+         
+    });
+    $('#asignar').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_empleo = button.data('id');   
+   
+    $.ajax({
+        url: '/obtener_datos_equipo/' + id_empleo + '/',   
+        method: 'GET',
+        success: function(data) {
+            $('#codigo_equipo').val(data.codigo_equipo);
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+
+$('#devolver').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_empleo = button.data('id');   
+   
+    $.ajax({
+        url: '/obtener_datos_equipo2/' + id_empleo + '/',   
+        method: 'GET',
+        success: function(data) {
+            $('#codigo_equipo_devolver').val(data.codigo_equipo_devolver);
+            $('#empleado_devolver').val(data.empleado_id);
+            $('#empleado_devolver_nombre').val(data.empleado)
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+
+
+$('#editModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');   
+    $.ajax({
+        url: '/info_software_editar/' + id_datos + '/',   
+        method: 'GET',
+        success: function(data) {
+           
+            $('#id_sistema').val(data.id_sistema);
+            $('#nombre_sistema_editar').val(data.nombre);
+            $('#ip_editar').val(data.ip);
+            $('#puerto_editar').val(data.puerto)
+            $('#enlace_editar').val(data.enlace);
+            $('#descripcion_editar').val(data.descripcion)
+          
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+        
+</script>
+
+
+
+
+{% endblock %}

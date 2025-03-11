@@ -1,0 +1,92 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+
+        <h3>Clasificacion por Edad</h3>
+        <br>
+    </div>
+
+</div>
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listado clasificacion por Edad</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
+                            class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>Numero</th>
+                                    <th>Fecha de Modificacion</th>
+                                    <th>Clasificacion</th>
+                                    <th>Rango Inicio</th>
+                                    <th>Rango Fin</th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">{{ dato.id_clas }}</td>
+                                    <td class="text-center">{{ dato.fecha_modificacion }}</td>
+                                    <td class="text-center">{{ dato.clasificacion }}</td>
+                                    <td class="text-center">{{ dato.rango_inicio }}</td>
+                                    <td class="text-center">{{ dato.rango_fin }}</td>
+                                    <td class="text-center">
+                                        {% if dato.activo == 1 %}
+                                        <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% endif %}
+                                        {% if dato.activo == 0 %}
+                                        <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                    
+                                        <button class="btn btn-success btn-sm" 
+                                        data-certificado-id="{{ dato.id_certificado }}" onclick="cargarCertificado(this)">
+                                            <li class="fa fa-edit"></li>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-toggle="modal"
+                                            data-target=".bs-example-modal-sm-show-{{ dato.id_certificado }}">
+                                            <li class="fa fa-trash"></li>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+       
+{% endblock %}

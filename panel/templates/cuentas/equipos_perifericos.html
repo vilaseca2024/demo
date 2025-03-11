@@ -1,0 +1,523 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+
+
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Lista de Equipos <button class="btn btn-round btn-success " data-toggle="modal"
+            data-target="#modal_agregar"><li class="fa fa-plus"></li> Agregar Equipo</button></h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Inventario de Equipo de Oficina</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                               
+                                <tr class="text-center">
+                                    <th>Codigo de Equipo</th>
+                                    <th>Nombre de Equipo</th>
+                                    <th>Encargado del Equipo</th>
+                                    <th>Cuenta<br/>Contraseña</th>
+                                    <th>Tipo de Cuenta</th>
+                                    <th>Cuenta Asignada a Empleado </th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+
+
+                                    <td class="text-center">{{ dato.equipo_id.codigo_equipo }}</td>
+                                   
+                                    <td class="text-center">{{ dato.equipo_id.nombre }}</td>
+                                  
+                                    <td class="text-center">
+                                        {% if dato.equipo_id.estado %}
+                                            {{dato.equipo_id.asignacion.empleado.first_name}} {{dato.equipo_id.asignacion.empleado.last_name}}
+                                        {% else %}
+                                            <a href="listar_equipos"
+                                                data-toggle="tooltip" 
+                                                data-placement="top" 
+                                                
+                                                data-original-title="Este equipo aun no fue asignado a un empleado" >
+                                                <span class="badge badge-warning" style="font-size: 12px;"><li class="fa fa-user"></li> Sin Asignar</span> 
+                                            </a>
+                                        {% endif %}
+
+                                    </td>
+                                    <td class="text-center"><b>{{ dato.usuario_cuenta }}</b><br/>***************</td>
+                                    <td class="text-center">{{ dato.tipo.descripcion }}</td>
+
+                                    <td class="text-center">
+                                        {% if dato.asignado_id.usuario %}
+                                            {{ dato.asignado_id.usuario.first_name }} {{ dato.asignado_id.usuario.last_name }}
+                                        {% else %}
+                                            <span class="badge badge-danger" style="font-size: 12px;"><li class="fa fa-users"></li> Sin Asignar</span>  
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a data-toggle="tooltip" data-placement="left" title="" data-original-title="Al presionar se enviara al administrador un codigo de verificacion">
+                                            <button class="btn btn-primary btn-sm"  id="codificar"
+                                                    data-toggle="modal" 
+                                                    data-target="#credencial"
+                                                    data-id="{{ dato.id_cuenta_equipo }}"  >
+                                                <li class="fa fa-key"></li>  
+                                            </button>
+                                        </a>
+                                     
+                                       
+                                      
+                                        <button class="btn btn-success btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#editar_cuenta"
+                                                data-id="{{ dato.id_cuenta_equipo}}"  >
+                                            <li class="fa fa-edit"></li>  
+                                        </button>
+                                  
+
+                                       
+                                        <button class="btn btn-danger btn-sm" data-toggle="modal"
+                                            data-target=".bs-example-modal-sm-show-{{ dato.id_certificado }}">
+                                            <li class="fa fa-trash"></li>
+                                        </button>
+                                        
+
+                                        <a data-toggle="tooltip" data-placement="left" title="" data-original-title="Presiona para actualizar la contraseña y empleado">
+                                            <button class="btn btn-secondary btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#cambiar_contrasena"
+                                                data-id="{{ dato.id_cuenta_equipo}}"  >
+                                            <li class="fa fa-refresh"></li>  
+                                        </button>
+                                        </a>
+
+                                        
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="cambiar_contrasena" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="cambiar_contrasena_cuenta" method="POST" id="demo-form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Actualizar Cuenta de Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body mt-2">
+                    <div class="form-row">
+                        <div class="form-group col-md-12 ">
+                            <label for="as">Equipo (*)</label>
+                            <input type="text" id="equipo_cambio" name="equipo_cambio" class="form-control" readonly>
+                            <input type="hidden" id="id_caso" name="id_caso" >
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="label">Motivo de Cambio de Cuenta (*)</label>
+                            <select id="tipo_cambiar" name="tipo_cambiar" class="form-control" style="width: 100%;" required>
+                                <option value="">Selecciona una Opcion</option>
+                                {% for motivo in motivos %}
+                                    <option value="{{ motivo.id_motivo }}">{{ motivo.descripcion }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                       
+                        <div class="form-group col-md-12">
+                            <label for="label">Estado de Cuenta (*)</label>
+                            <select id="cambiar_estado" name="cambiar_estado" class="form-control" style="width: 100%;" required>
+                                <option value="">Selecciona una Opcion</option>
+                                <option value="1">Cambiar Contraseña y Mantener Empleado Asignado</option>
+                                <option value="2">Mantener Contraseña y Cambiar Empleado Asignado</option>
+                                <option value="3">Cambiar Contraseña y Cambiar Empleado Asignado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-12" id="div_empleado" style="display: none;">
+                            <label for="cambiar_empleado">Empleado Asignado (*)</label>
+                            
+                            <select class="selectize" id="cambiar_empleado" name="cambiar_empleado" >
+                                <option value="">Seleccione un empleado</option>
+                                {%for usuario in usuarios%}
+                                    <option value="{{usuario.id}}">{{usuario.first_name}} {{usuario.last_name }}</option>
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-12" id="div_contrasena" style="display: none;">
+                            <label for="cambiar_contrasena_cuenta">Nueva Contraseña (*)</label>
+                            <input type="text" id="cambiar_contrasena_cuenta" name="cambiar_contrasena_cuenta" class="form-control" >
+                        </div>
+                        
+                      
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL PARA EDITAR -->
+<div class="modal fade bs-example-modal-lg" id="editar_cuenta" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="editar_usuario_equipo" method="POST" id="demo-form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Editar Cuenta de Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body mt-2">
+                    <div class="form-row">
+                        <div class="form-group col-md-12 ">
+                            <label for="as">Equipo (*)</label>
+                            <select id="equipo_seleccionado_editar" name="equipo_seleccionado_editar" class="form-control" style="width: 100%;" required>
+                              
+                                {% for equipo in equipos %}
+                                    <option value="{{ equipo.id_equipo }}">{{ equipo.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="label">Tipo Cuenta (*)</label>
+                            <select id="tipo_equipo_cuenta_editar" name="tipo_equipo_cuenta_editar" class="form-control" style="width: 100%;" required>
+                                
+                                {% for tipo in tipos %}
+                                    <option value="{{ tipo.id_tipo }}">{{ tipo.descripcion }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            <label for="fecha_asignado_equipo_editar">Fecha Asignado (*)</label>
+                            <input type="date" id="fecha_asignado_equipo_editar" name="fecha_asignado_equipo_editar" class="form-control" required>
+                        </div>
+                        
+                        
+                       
+                        <div class="form-group col-md-6 ">
+                            <label for="usuario_equipo_editar">Usuario de Cuenta (*)</label>
+                            <input type="text" id="usuario_equipo_editar" name="usuario_equipo_editar" class="form-control" required>
+                            <input type="hidden" id="id_usuario_equipo" name="id_usuario_equipo" class="form-control" required>
+                        </div>
+                 
+                        
+                        <div class="form-group col-md-12">
+                            <label for="observaciones_editar">Observaciones</label>
+                            <textarea class="form-control" id="observaciones_editar" name="observaciones_editar" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="modal_agregar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="agregar_usuario_equipo" method="POST" id="demo-form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar nueva Cuenta de Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body mt-2">
+                    <div class="form-row">
+                        <div class="form-group col-md-12 ">
+                            <label for="as">Equipo (*)</label>
+                            <select id="equipo_seleccionado" name="equipo_seleccionado" class="selectize" style="width: 100%;" required>
+                                <option value="">Selecciona una equipo</option>
+                                {% for equipo in equipos %}
+                                    <option value="{{ equipo.id_equipo }}">{{ equipo.codigo_equipo }} : {{ equipo.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                           
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            <label for="fecha_asignado_equipo">Fecha Asignado (*)</label>
+                            <input type="date" id="fecha_asignado_equipo" name="fecha_asignado_equipo" class="form-control" required>
+                        </div>
+                        
+                        
+                        <div class="form-group col-md-6">
+                            <label for="label">Tipo Cuenta (*)</label>
+                            <select id="tipo_equipo_cuenta" name="tipo_equipo_cuenta" class="selectize" style="width: 100%;" required>
+                                <option value="">Selecciona una tipo</option>
+                                {% for tipo in tipos %}
+                                    <option value="{{ tipo.id_tipo }}">{{ tipo.descripcion }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            <label for="usuario_equipo">Usuario de Cuenta (*)</label>
+                            <input type="text" id="usuario_equipo" name="usuario_equipo" class="form-control" required>
+                            
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            <label for="contrasena">Contraseña (*)</label>
+                            <input type="text" id="contrasena" name="contrasena" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group col-md-12 ">
+                            <label for="marca">Empleado Asignado (*)</label>
+                            <select class="selectize" id="select_empleado_1" name="select_empleado_1" required>
+                                <option value="">Seleccione un empleado</option>
+                                {%for usuario in usuarios%}
+                                    <option value="{{usuario.id}}">{{usuario.first_name}} {{usuario.last_name }}</option>
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea class="form-control" id="observaciones" name="observaciones" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div class="modal fade bs-example-modal-lg" id="credencial" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="verificar_codigo_equipo/" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row "> 
+                        <input type="hidden" id="data-id-hidden" name="data_id">
+                        <div class="text-center mt-4">
+                            <li class="fa fa-5x fa-exclamation-triangle"></li>
+                            <h4 class="mt-2">El acceso para esta informacion es restringido para visualizarlo debe ingresar el codigo enviado al correo del administrador principal</h4>
+                        </div>
+                         
+                        <div class="item form-group mt-4">
+                            <label class="col-form-label col-md-7 col-sm-7 label-align" for="codigo_ingresado">Ingresa el Código</label>
+                            <div class="col-md-5 col-sm-5">
+                                <input type="text" id="codigo_ingresado" name="codigo_ingresado" required="required" class="form-control" placeholder="X_X_X_X_X_X_X_X">
+                            </div>
+                            <label class="col-form-label col-md-5 col-sm-5" for="codigo_ingresado">Tiempo restante: 0<span id="tiempo-restante">1:30</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Verificar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="datos" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+          
+            <div class="modal-body">
+                <div class="d-flex justify-content-center align-items-center" style="height: 100%; flex-direction: column;">
+                    <div class="text-center">
+                        <li class="fa fa-5x fa-key"></li>
+                        <h4 class="mt-2">Dato obtenido:</h4>
+                        <h3 id="codigo-verificado" class="mt-2"></h3> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+document.getElementById('cambiar_estado').addEventListener('change', function() {
+        var valorSeleccionado = this.value;
+        document.getElementById('div_empleado').style.display = 'none';
+        document.getElementById('div_contrasena').style.display = 'none';
+        if (valorSeleccionado == '1') {
+            document.getElementById('div_contrasena').style.display = 'block';  
+        } else if (valorSeleccionado == '2') {
+            document.getElementById('div_empleado').style.display = 'block';  
+        } else if (valorSeleccionado == '3') {
+            document.getElementById('div_empleado').style.display = 'block';  
+            document.getElementById('div_contrasena').style.display = 'block';
+        }
+    });
+
+$('#editar_cuenta').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');   
+   
+    $.ajax({
+        url: '/info_equipos_cuentas_editar/' + id_datos + '/',   
+        method: 'GET',
+        success: function(data) {
+            $('#id_usuario_equipo').val(data.id);
+            $('#equipo_seleccionado_editar').val(data.equipo_id);
+            $('#observaciones_editar').val(data.observaciones)
+            $('#tipo_equipo_cuenta_editar').val(data.tipo);
+            $('#select_empleado_1_editar').val(data.asignado_id);
+            $('#fecha_asignado_equipo_editar').val(data.fecha);
+            $('#usuario_equipo_editar').val(data.usuario_cuenta)
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+
+$('#cambiar_contrasena').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');   
+   
+    $.ajax({
+        url: '/info_cambiar/' + id_datos + '/',   
+        method: 'GET',
+        success: function(data) {
+            $('#equipo_cambio').val(data.equipo_cambio);
+            $('#id_caso').val(data.id_equipo_cambio);
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+  
+
+$(document).ready(function() {
+        $('#equipo_seleccionado').selectize(); 
+        $('#tipo_equipo_cuenta').selectize(); 
+        
+        $('#select_empleado_1').selectize();
+        $('#cambiar_empleado').selectize(); 
+    });
+        
+  let intervalo; 
+    $(document).on('click', '#codificar', function () {
+        if (intervalo) {
+            clearInterval(intervalo);  
+        }
+        var dataId = $(this).data('id');
+        $('#data-id-hidden').val(dataId);
+        var boton = $(this);  
+        boton.prop('disabled', true);  
+        $.ajax({
+            url: '{% url "enviar_codigo" %}',  
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                alert(response.message);
+                let tiempoRestante = 90;  
+                intervalo = setInterval(function() {
+                    let minutos = Math.floor(tiempoRestante / 60);
+                    let segundos = tiempoRestante % 60;
+                    $('#tiempo-restante').text(`${minutos}:${segundos.toString().padStart(2, '0')}`);
+                    tiempoRestante--;
+                    if (tiempoRestante < 0) {
+                        clearInterval(intervalo);
+                        alert('El código ha expirado');
+                        boton.prop('disabled', false);  
+                    }
+                }, 1000);
+            },
+            error: function(error) {
+                alert('Error al enviar el código');
+                boton.prop('disabled', false);  
+            }
+        });
+    });
+    $(document).on('submit', '#demo-form2', function(e) {
+    e.preventDefault();  
+    $.ajax({
+        url: '{% url "verificar_codigo_equipo" %}', 
+        method: 'POST',
+        data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            codigo_ingresado: $('#codigo_ingresado').val(),
+            data: $('#data-id-hidden').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                $('#codigo-verificado').text(response.codigo);  
+                $('#datos').modal('show');  
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(error) {
+            alert('Error al verificar el código');
+        }
+    });
+});
+
+
+</script>
+
+
+   
+
+{% endblock %}

@@ -1,0 +1,347 @@
+{% extends 'menu.html' %}
+{% load static %}
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+
+        <h3>Tickets - Solicitudes {% if grupo == 'Administradores' %}<button class="btn btn-round btn-info" data-toggle="modal"
+                data-target=".bs-example-modal-lg">
+                <li class="fa fa-plus"></li> Nuevo Tickets 
+            </button>{% endif %} </h3>
+        <br>
+    </div>
+
+</div>
+<style>
+    .mensaje-truncado {
+    display: inline-block;
+    width: 120px; /* Ajusta el ancho según lo que necesites */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mensaje-completo {
+    display: none;
+}
+
+</style>
+<div class="col-md-12 col-sm-12 ">
+
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listado de Tickets</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
+                            class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                               
+              
+                                <tr class="text-center">
+                                    <th>#</th>
+                                    <th>Usuario Solicitante</th>
+                                    <th>Fecha de Respuesta</th>
+                                    <th>Mensaje</th>
+                                    <th>Diagnostico</th>
+                                    <th>Accion</th>
+                                    <th>correccion</th>
+                                    <th>recomendacion</th>
+                                    <th>Estado</th>
+                 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">TICKET<br/>{{ dato.id_ticket }}</td>
+                                    <td class="text-center">
+                                        {{dato.usuario.first_name}} {{dato.usuario.last_name}}
+                                    </td>
+                                    <td>{{ dato.fecha_respuesta }}</td>
+                                    <td>
+                                        <span class="mensaje-truncado" id="mensaje-{{ dato.id_ticket }}">
+                                            {{ dato.mensaje|truncatechars:15 }}
+                                        </span>
+                                        <a href="javascript:void(0);" class="ver-mas" onclick="mostrarMas('{{ dato.id_ticket }}')">ver más</a>
+                                        <span class="mensaje-completo" id="mensaje-completo-{{ dato.id_ticket }}" style="display:none;">
+                                            {{ dato.mensaje }}
+                                        </span>
+                                    </td>
+                                    <!-- Aquí vamos a agregar los campos con los enlaces 'ver más' -->
+                                    <td>
+                                        <span class="mensaje-truncado" id="diagnostico-{{ dato.id_ticket }}">
+                                            {{ dato.diagnostico|truncatechars:15 }}
+                                        </span>
+                                        <a href="javascript:void(0);" class="ver-mas" onclick="mostrarMasDiagnostico('{{ dato.id_ticket }}')">ver más</a>
+                                        <span class="mensaje-completo" id="diagnostico-completo-{{ dato.id_ticket }}" style="display:none;">
+                                            {{ dato.diagnostico }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="mensaje-truncado" id="accion-{{ dato.id_ticket }}">
+                                            {{ dato.accion|truncatechars:15 }}
+                                        </span>
+                                        <a href="javascript:void(0);" class="ver-mas" onclick="mostrarMasAccion('{{ dato.id_ticket }}')">ver más</a>
+                                        <span class="mensaje-completo" id="accion-completo-{{ dato.id_ticket }}" style="display:none;">
+                                            {{ dato.accion }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="mensaje-truncado" id="correccion-{{ dato.id_ticket }}">
+                                            {{ dato.correccion|truncatechars:15 }}
+                                        </span>
+                                        <a href="javascript:void(0);" class="ver-mas" onclick="mostrarMasCorreccion('{{ dato.id_ticket }}')">ver más</a>
+                                        <span class="mensaje-completo" id="correccion-completo-{{ dato.id_ticket }}" style="display:none;">
+                                            {{ dato.correccion }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="mensaje-truncado" id="recomendacion-{{ dato.id_ticket }}">
+                                            {{ dato.recomendacion|truncatechars:15 }}
+                                        </span>
+                                        <a href="javascript:void(0);" class="ver-mas" onclick="mostrarMasRecomendacion('{{ dato.id_ticket }}')">ver más</a>
+                                        <span class="mensaje-completo" id="recomendacion-completo-{{ dato.id_ticket }}" style="display:none;">
+                                            {{ dato.recomendacion }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if dato.estado == False %}
+                                        <a href="#" data-toggle="modal" data-target="">
+                                            <span class="badge badge-warning" style="font-size: 12px;">
+                                                <li class="fa fa-clock-o"></li> En Revision
+                                            </span>
+                                        </a>
+                                        {% else %}
+                                        <a href="#" data-toggle="modal" data-target="">
+                                            <span class="badge badge-success" style="font-size: 12px;">
+                                                <li class="fa fa-check-square-o"></li> Completado
+                                            </span>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="info" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Informacion del Empleado</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                           <label for="nombre_empleado_editar"><b>EMPLEADO SOLICITANTE : </b> Juan carlos </label>
+                            
+                            
+                        </div>
+                        <div class="form-group col-md-12">
+                            <b><label for="nombre_equipo_editar">EQUIPOS ASIGNADOS</label></b>
+                            <ul id="equipos-list">
+                                <li></li>
+                                <li></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="form-group col-md-12">
+                            <b><label for="marca_editar">CUENTAS ASIGNADAS</label></b>
+                            <ul id="cuentas-list">
+                                <li></li>
+                                <li></li>
+                            </ul>
+                        </div>
+                        
+                       
+                    </div>
+
+                    
+                </div>
+
+             
+            </div>
+       
+    </div>
+</div>
+<script>
+    function mostrarMas(ticketId) {
+        var mensajeTruncado = document.getElementById('mensaje-' + ticketId);
+        var mensajeCompleto = document.getElementById('mensaje-completo-' + ticketId);
+        var enlaceVerMas = document.querySelector('a[onclick="mostrarMas(\'' + ticketId + '\')"]');
+        mensajeTruncado.style.display = 'none';
+        mensajeCompleto.style.display = 'inline';
+        enlaceVerMas.innerHTML = 'ver menos';
+        enlaceVerMas.setAttribute('onclick', 'mostrarMenos(\'' + ticketId + '\')');
+    }
+
+    function mostrarMenos(ticketId) {
+        var mensajeTruncado = document.getElementById('mensaje-' + ticketId);
+        var mensajeCompleto = document.getElementById('mensaje-completo-' + ticketId);
+        var enlaceVerMas = document.querySelector('a[onclick="mostrarMenos(\'' + ticketId + '\')"]');
+        mensajeTruncado.style.display = 'inline';
+        mensajeCompleto.style.display = 'none';
+        enlaceVerMas.innerHTML = 'ver más';
+        enlaceVerMas.setAttribute('onclick', 'mostrarMas(\'' + ticketId + '\')');
+    }
+
+    function mostrarMasDiagnostico(ticketId) {
+    var diagnosticoTruncado = document.getElementById('diagnostico-' + ticketId);
+    var diagnosticoCompleto = document.getElementById('diagnostico-completo-' + ticketId);
+    var enlaceVerMas = document.querySelector('a[onclick="mostrarMasDiagnostico(\'' + ticketId + '\')"]');
+
+    // Cambiar el texto y mostrar el diagnóstico completo
+    diagnosticoTruncado.style.display = 'none';
+    diagnosticoCompleto.style.display = 'inline';
+
+    // Cambiar el texto del enlace
+    enlaceVerMas.innerHTML = 'ver menos';
+    enlaceVerMas.setAttribute('onclick', 'mostrarMenosDiagnostico(\'' + ticketId + '\')');
+}
+
+function mostrarMenosDiagnostico(ticketId) {
+    var diagnosticoTruncado = document.getElementById('diagnostico-' + ticketId);
+    var diagnosticoCompleto = document.getElementById('diagnostico-completo-' + ticketId);
+    var enlaceVerMas = document.querySelector('a[onclick="mostrarMenosDiagnostico(\'' + ticketId + '\')"]');
+    
+    diagnosticoTruncado.style.display = 'inline';
+    diagnosticoCompleto.style.display = 'none';
+    enlaceVerMas.innerHTML = 'ver más';
+    enlaceVerMas.setAttribute('onclick', 'mostrarMasDiagnostico(\'' + ticketId + '\')');
+}
+
+// Funciones para Acción, Corrección y Recomendación de manera similar:
+function mostrarMasAccion(ticketId) {
+    var accionTruncado = document.getElementById('accion-' + ticketId);
+    var accionCompleto = document.getElementById('accion-completo-' + ticketId);
+    var enlaceVerMas = document.querySelector('a[onclick="mostrarMasAccion(\'' + ticketId + '\')"]');
+    
+    accionTruncado.style.display = 'none';
+    accionCompleto.style.display = 'inline';
+    
+    enlaceVerMas.innerHTML = 'ver menos';
+    enlaceVerMas.setAttribute('onclick', 'mostrarMenosAccion(\'' + ticketId + '\')');
+}
+
+function mostrarMenosAccion(ticketId) {
+    var accionTruncado = document.getElementById('accion-' + ticketId);
+    var accionCompleto = document.getElementById('accion-completo-' + ticketId);
+    var enlaceVerMas = document.querySelector('a[onclick="mostrarMenosAccion(\'' + ticketId + '\')"]');
+    
+    accionTruncado.style.display = 'inline';
+    accionCompleto.style.display = 'none';
+    
+    enlaceVerMas.innerHTML = 'ver más';
+    enlaceVerMas.setAttribute('onclick', 'mostrarMasAccion(\'' + ticketId + '\')');
+}
+
+function mostrarMasCorreccion(ticketId) {
+    var correccionTruncado = document.getElementById('correccion-' + ticketId);
+    var correccionCompleto = document.getElementById('correccion-completo-' + ticketId);
+    var enlaceVerMas = document.querySelector('a[onclick="mostrarMasCorreccion(\'' + ticketId + '\')"]');
+    
+    correccionTruncado.style.display = 'none';
+    correccionCompleto.style.display = 'inline';
+    
+    enlaceVerMas.innerHTML = 'ver menos';
+    enlaceVerMas.setAttribute('onclick', 'mostrarMenosCorreccion(\'' + ticketId + '\')');
+}
+
+function mostrarMenosCorreccion(ticketId) {
+    var correccionTruncado = document.getElementById('correccion-' + ticketId);
+    var correccionCompleto = document.getElementById('correccion-completo-' + ticketId);
+    var enlaceVerMas = document.querySelector('a[onclick="mostrarMenosCorreccion(\'' + ticketId + '\')"]');
+    
+    correccionTruncado.style.display = 'inline';
+    correccionCompleto.style.display = 'none';
+    
+    enlaceVerMas.innerHTML = 'ver más';
+    enlaceVerMas.setAttribute('onclick', 'mostrarMasCorreccion(\'' + ticketId + '\')');
+}
+
+function mostrarMasRecomendacion(ticketId) {
+    var recomendacionTruncado = document.getElementById('recomendacion-' + ticketId);
+    var recomendacionCompleto = document.getElementById('recomendacion-completo-' + ticketId);
+    var enlaceVerMas = document.querySelector('a[onclick="mostrarMasRecomendacion(\'' + ticketId + '\')"]');
+    
+    recomendacionTruncado.style.display = 'none';
+    recomendacionCompleto.style.display = 'inline';
+    
+    enlaceVerMas.innerHTML = 'ver menos';
+    enlaceVerMas.setAttribute('onclick', 'mostrarMenosRecomendacion(\'' + ticketId + '\')');
+}
+
+function mostrarMenosRecomendacion(ticketId) {
+    var recomendacionTruncado = document.getElementById('recomendacion-' + ticketId);
+    var recomendacionCompleto = document.getElementById('recomendacion-completo-' + ticketId);
+    var enlaceVerMas = document.querySelector('a[onclick="mostrarMenosRecomendacion(\'' + ticketId + '\')"]');
+    
+    recomendacionTruncado.style.display = 'inline';
+    recomendacionCompleto.style.display = 'none';
+    
+    enlaceVerMas.innerHTML = 'ver más';
+    enlaceVerMas.setAttribute('onclick', 'mostrarMasRecomendacion(\'' + ticketId + '\')');
+}
+
+
+    $('#info').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);  
+    var id_datos = button.data('id');    
+
+    $.ajax({
+        url: '/info_ticket/' + id_datos + '/',  
+        method: 'GET',
+        success: function(data) {
+            $('#info .modal-body').find('label[for="nombre_empleado_editar"]').text("EMPLEADO SOLICITANTE: " + data.empleado);
+            $('#equipos-list').empty();
+            $('#cuentas-list').empty();
+            data.equipos.forEach(function(equipo) {
+                var li = $('<li>').text(equipo);
+                $('#equipos-list').append(li);
+            });
+            data.cuentas.forEach(function(cuenta) {
+                var li = $('<li>').text(cuenta);
+                $('#cuentas-list').append(li);
+            });
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+});
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,464 @@
+
+
+{% extends 'menu.html' %}
+
+{% block content %}
+
+<a id="editar-link" style="display:none;" onclick="new PNotify({
+    title: 'Datos Editados',
+    text: 'Los datos editados se registraron y guardaron correctamente.',
+    icon: 'fa fa-edit fa-2x',  
+    styling: 'bootstrap3',
+});">Editar</a>
+
+<a id="success-link" style="display:none;" onclick="new PNotify({
+    title: 'Mensaje de Éxito',
+    text: 'Los datos de la NUEVA OFICINA se han agregado correctamente.',
+    type: 'success',
+    icon: 'fa fa-check-circle fa-2x',  
+    styling: 'bootstrap3'
+}); ">Posi</a>
+
+<a id="error-link" style="display:none;" onclick="new PNotify({
+    title: 'Oh No!',
+    text: 'Ocurrió un error al guardar los datos.',
+    type: 'error',
+    icon: 'fa fa-exclamation-triangle fa-2x', 
+    styling: 'bootstrap3'
+});">Error</a>
+
+<a id="activar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Activado',
+    text: 'Se activo el registro correctamente.',
+    type: 'info',
+    styling: 'bootstrap3',
+    icon: 'fa fa-plus-circle fa-2x',  
+    
+});">activar</a>
+
+<a id="desactivar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Desactivado',
+    text: 'Se desactivo el registro correctamente.',
+    type: 'error',
+    icon: 'fa fa-trash-o fa-2x', 
+    styling: 'bootstrap3'
+});">desactivar</a>
+
+<a id="subir-link" style="display:none;" onclick="new PNotify({
+    title: 'Archivo guardado correctamente',
+    text: 'La copia de seguridad se ha guardado correctamente',
+    type: 'info',
+    styling: 'bootstrap3',
+    addclass: 'dark',
+    icon: 'fa fa-envelope fa-2x',  
+});">desactivar</a>
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Oficinas y Sedes por Departamento
+            <button class="btn btn-round btn-success " data-toggle="modal"
+            data-target="#agregar_empresa"><li class="fa fa-plus"></li> Agregar Nuevo Oficina
+        </button>
+    </h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listado de Oficinas</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                           
+                                
+                                <tr class="text-center">
+                                    <th>ID Oficina</th>
+                                    <th>Fecha</th>
+                                    <th>Nombre Oficina</th>
+                                    <th>Departamento</th>
+                                    <th>Ubicacion</th>
+                                    <th>Latitud<br/>Longitud</th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">OF-00{{dato.id_oficina}}</td>
+                                    <td class="text-center">{{ dato.fecha }}</td>
+                                    <td class="text-center">{{ dato.nombre }}</td>
+                                    <td class="text-center">{{ dato.departamento.departamento }}</td>
+                                    <td class="text-center">{{ dato.direccion }}</td>
+                                    <td class="text-center">{{ dato.latitud }}<br/> {{dato.longitud }}</td>
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center"> 
+                                        <button class="btn btn-success btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#editModal"
+                                                data-id="{{ dato.id_oficina }}" 
+                                                data-fecha="{{ dato.fecha|date:'Y-m-d' }}"
+                                                data-nombre="{{ dato.nombre }}"
+                                                data-direccion="{{ dato.direccion }}" 
+                                                data-latitud="{{ dato.latitud }}"
+                                                data-longitud="{{ dato.longitud }}"
+                                                data-departamento_id="{{ dato.departamento_id }}"> 
+                                                
+                                            <li class="fa fa-edit"></li>
+                                        </button>
+                                
+                                       
+                                        {% if dato.activo == 1 %}
+                                            <button class="btn btn-danger btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#eliminar"
+                                            data-id="{{ dato.id_oficina }}"  >
+                                                <li class="fa fa-trash"></li>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-info btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#activar"
+                                            data-id="{{ dato.id_oficina }}"  >
+                                                <li class="fa fa-plus-square-o"></li>
+                                            </button>
+                                        {% endif %}
+                                        
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="editar_datos_oficina" method="POST" id="demo-form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Editar Informacion de Oficina</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body mt-2">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="nombre_editar">Nombre de Oficina</label>
+                            <input type="text" id="nombre_editar" name="nombre_editar" class="form-control" style="text-transform: uppercase;" required>
+                            <input type="hidden" id="id_oficina_editar" name="id_oficina_editar" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="">Departamento (*)</label>
+                            <select id="departamento_editar" name="departamento_editar" class="form-control" required>
+                                <option value="">Selecciona un Departamento</option>
+                                {% for depa in departamentos %}
+                                    <option value="{{ depa.id_depa }}">{{ depa.departamento }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>    
+                        <div class="form-group col-md-12">
+                            <label for="direccion_editar">Direccion</label>
+                            <textarea class="form-control" id="direccion_editar" name="direccion_editar" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+                        </div>
+                       
+                        <div class="form-group col-md-6">
+                            <label for="latitud_editar">Latitud</label>
+                            <input type="text" id="latitud_editar" name="latitud_editar" class="form-control" required>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="longitud_editar">Longitud</label>
+                            <input type="text" id="longitud_editar" name="longitud_editar" class="form-control" required>
+                        </div>
+                       
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg-asignar" id="ver_informe" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="agregar_archivo_backup" method="POST" id="demo-form2" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Backup de Correo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <h5><b>OPCION 1:</b> SUBE EL ARCHIVO</h5>
+                            <label for="archivo">Sube un archivo con el backup correspondiente</label>
+                            <input type="file" id="archivo" name="archivo" class="form-control" onchange="toggleEnlaceInput()">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped bg-primary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <input type="hidden" id="id_backup" name="id_backup" class="form-control"/>
+                        </div>
+                        <div class="form-group col-md-12 mt-4">
+                            <h5><b>OPCION 2:</b> INGRESA EL ENLACE DEL ARCHIVO</h5>
+                            <label for="enlace_archivo">Sube el enlace drive del archivo</label>
+                            <input type="text" id="enlace_archivo" name="enlace_archivo" class="form-control" placeholder="https://drive.google.com/drive/..." disabled>
+                        </div>
+                    </div>
+            
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+<script>
+   
+    function toggleEnlaceInput() {
+        var archivoInput = document.getElementById('archivo');
+        var enlaceInput = document.getElementById('enlace_archivo');
+        if (archivoInput.files.length > 0) {
+            enlaceInput.disabled = true;
+        } else {
+            enlaceInput.disabled = false;
+        }
+    }
+    
+    document.getElementById('demo-form2').addEventListener('submit', function (event) {
+        var progressBar = document.querySelector('.progress-bar');
+        var progress = 0;
+        
+        var interval = setInterval(function () {
+            if (progress < 100) {
+                progress += 0.8;
+                progressBar.style.width = progress + '%';
+                progressBar.setAttribute('aria-valuenow', progress);
+            } else {
+                clearInterval(interval);
+            }
+        }, 500);
+    });
+</script>
+
+
+<div class="modal fade bs-example-modal-lg" id="eliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="eliminar_datos_oficina" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Confirma si deseas desactivar este Registro de Informe?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_eliminar" id="id_eliminar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Desactivar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="activar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="activar_datos_oficina" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-plus-square-o"></li>
+                        <h4 class="mt-2">Confirma si deseas Activar este Registro de Informe?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_activar" id="id_activar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Activar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="agregar_empresa" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="agregar_oficina" method="POST" id="demo-form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar nueva Informacion de Oficina</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body mt-2">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="nombre">Nombre de Oficina</label>
+                            <input type="text" id="nombre" name="nombre" class="form-control" style="text-transform: uppercase;" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="departamento">Departamento (*)</label>
+                            <select id="departamento" name="departamento" class="selectize" required>
+                                <option value="">Selecciona un Departamento</option>
+                                {% for depa in departamentos %}
+                                    <option value="{{ depa.id_depa }}">{{ depa.departamento }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="direccion">Direccion</label>
+                            <textarea class="form-control" id="direccion" name="direccion" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+                        </div>
+                       
+                        <div class="form-group col-md-6">
+                            <label for="latitud">Latitud</label>
+                            <input type="text" id="latitud" name="latitud" class="form-control" required>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="longitud">Longitud</label>
+                            <input type="text" id="longitud" name="longitud" class="form-control" required>
+                        </div>
+                       
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    
+$('#editModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+                
+    var id_datos = button.data('id'); 
+    var fecha = button.data('fecha');
+    var nombre = button.data('nombre');
+    var direccion = button.data('direccion');
+    var latitud = button.data('latitud');
+    var departamento_id = button.data('departamento_id');
+    var longitud = button.data('longitud');
+            
+    $('#nombre_editar').val(nombre);
+    $('#id_oficina_editar').val(id_datos);
+    $('#departamento_editar').val(departamento_id);
+    $('#direccion_editar').val(direccion);
+    $('#latitud_editar').val(latitud);
+    $('#longitud_editar').val(longitud);
+    
+});      
+    $('#eliminar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_eliminar').val(id_datos);
+    });
+    $('#activar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_activar').val(id_datos);
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        if (document.getElementById('success-link') && '{{ request.GET.success }}') {
+            document.getElementById('success-link').click();
+        }
+        if (document.getElementById('error-link') && '{{ request.GET.error }}') {
+            document.getElementById('error-link').click();
+        }
+        if (document.getElementById('editar-link') && '{{ request.GET.editar }}') {
+            document.getElementById('editar-link').click();
+        }
+        if (document.getElementById('asignar-link') && '{{ request.GET.asignar }}') {
+            document.getElementById('asignar-link').click();
+        }
+        if (document.getElementById('devolver-link') && '{{ request.GET.devolver }}') {
+            document.getElementById('devolver-link').click();
+        }
+        if (document.getElementById('activar-link') && '{{ request.GET.activar }}') {
+            document.getElementById('activar-link').click();
+        }
+        if (document.getElementById('desactivar-link') && '{{ request.GET.desactivar }}') {
+            document.getElementById('desactivar-link').click();
+        }
+
+        $('#correos_data').selectize();
+        $('#numero_disco').selectize();
+        $('#tipo_nuevo').selectize();
+        $('#solicitante').selectize();
+        $('#sistema_data').selectize();
+        $('#departamento').selectize();
+         
+        
+    });
+
+    $('#ver_informe').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id'); 
+        $('#id_backup').val(id_datos); 
+        
+    });  
+   
+     
+</script>
+
+{% endblock %}

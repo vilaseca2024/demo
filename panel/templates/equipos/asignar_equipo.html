@@ -1,0 +1,552 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Lista de Equipos <button class="btn btn-round btn-success btn-sm" data-toggle="modal"
+            data-target=".bs-example-modal-lg"><li class="fa fa-plus"></li> Agregar Equipo</button></h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Inventario de Equipo de Oficina</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>#</th>
+                                    <th>Fecha de Compra</th>
+                                    <th>Nombre</th>
+                                    <th>Marca</th>
+                                    <th>Descripcion</th>
+                                    <th>Tipo<br/>Tamano</th>
+                                    <th>Antiguo</th>
+                                    <th>QR's</th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">{{ dato.id_equipo }}</td>
+                                    <td class="text-center">{{ dato.fecha_registro }}</td>
+                                    <td class="text-center">{{ dato.nombre }}</td>
+                                    <td class="text-center">{{ dato.marca }}</td>
+                                    <td class="text-center">{{ dato.modelo }}</td>
+                                    
+                                    <td class="text-center">{{ dato.tipo }}<br/>{{ dato.tamano }}</td>
+                                    <td class="text-center">
+                                        {% if dato.antiguo %}
+                                        <span class="badge badge-primary">
+                                            Equipo Antiguo
+                                        </span>
+                                        {% else %}
+                                        <span class="badge badge-success">
+                                            Equipo Nuevo
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        
+                                        <img src={{dato.qr}} alt="Sin Foto" class="img-thumbnail" style="height: auto; width: 100px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#fotoModal" data-img-url={{dato.qr}}>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="ver_equipo/{{dato.id_equipo}}">
+                                            <button class="btn btn-primary btn-sm">
+                                                <li class="fa fa-eye"></li>  
+                                            </button>
+                                        </a>
+                                        <button class="btn btn-success btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#editModal"
+                                                data-id="{{ dato.id_contacto }}"  >
+                                            <li class="fa fa-edit"></li>  
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-toggle="modal"
+                                            data-target=".bs-example-modal-sm-show-{{ dato.id_certificado }}">
+                                            <li class="fa fa-trash"></li>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="agregar_equipo" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar nuevo Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="nombre_equipo">Identificicador Equipo</label>
+                            <input type="text" id="nombre_equipo" name="nombre_equipo" class="form-control"required>
+                        </div>
+                        <div class="form-group col-md-4 ">
+                            <label for="marca">Marca</label>
+                            <input type="text" id="marca" name="marca" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="modelo">Modelo</label>
+                            <input type="text" id="modelo" name="modelo" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        
+                        <div class="form-group col-md-4">
+                            <label for="tipo">Tipo de Equipo</label>
+                            <select class="form-control" id="tipo" name="tipo">
+                                <option value="">----------</option>
+                                <option value="Portatil">Portatil</option>
+                                <option value="Equipo de Escritorio">Equipo de Escritorio</option>
+                                <option value="Cableado">Cableado</option>
+                                <option value="Redes">Redes</option>
+                                <option value="Equipo Complementario">Equipo Complementario</option>
+                            </select>
+                            
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="tamano">Tamaño</label>
+                            <select class="form-control" id="tamano" name="tamano">
+                                <option value="">----------</option>
+                                <option value="Grande">Grande</option>
+                                <option value="Mediano">Mediano</option>
+                                <option value="Pequeno">Pequeño</option>
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="fecha_registro">Fecha de Registro</label>
+                            <input type="date" id="fecha_registro" name="fecha_registro" class="form-control" required>
+                        </div>
+                         
+                    </div>
+
+                    <div class="form-row">
+                  
+                        <div class="form-group col-md-8">
+                            <label for="tamano">Fotos del equipo (5 fotos)</label>
+                            <input type="file" id="fotos" name="fotos" class="form-control" >
+                        </div>
+                        
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="descripcion">Descripcion</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" style="height: 100px;" value="Describa el equipo con detalles">
+                            </textarea>
+                        </div>
+                        <div class="col-md-6 col-sm-6 ">
+                            <label for="componentes">Componentes Adicionales</label>
+                            <input id="tags_1" name="componentes" type="text" class="tags form-control" value="Teclado, Mouse" />
+                            <div id="suggestions-container" style="position: relative; float: left;  margin: 10px;"></div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-row">
+                        
+                     
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fotoModalLabel">Imagen del Domicilio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <!-- Imagen ampliada -->
+                <img id="modalImage" src="" alt="Imagen no Encontrada" class="img-fluid" style="width: 400px;">
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="actualizar_datos_contactos_empleado" method="POST" id="demo-form2" enctype="multipart/form-data"> 
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Editar Datos Empleado</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Telefono -->
+                    <div class="form-row">
+                        <div class="form-group col-md-5">
+                            <label for="telefono">Telefono/Celular</label>
+                            <input type="number" id="telefono" name="telefono" class="form-control" required="required">
+                        </div>
+                   
+                        <div class="form-group col-md-7">
+                            <label for="direccion">Dirección <span class="required">*</span></label>
+                            <input type="text" id="direccion" name="direccion"  class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Latitud y Longitud -->
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="latitud">Latitud</label>
+                            <input type="text" id="latitud" name="latitud" class="form-control" required>
+                            
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="longitud">Longitud</label>
+                            <input type="text" id="longitud" name="longitud" class="form-control" required>
+                           
+                        </div>
+                    </div>
+
+                    <!-- Foto de Puerta -->
+                    <div class="form-row">
+                        <div class="form-group col-md-9">
+                            <label for="foto_puerta">Foto de Puerta</label>
+                            
+                            <input type="file" id="foto_puerta" name="foto_puerta" class="form-control" accept="image/*" >
+                           
+                        </div>
+                        <div class="col-md-3">
+                            <div id="preview-container" class="preview-container"></div>
+                        </div>
+                        <img id="foto_puerta_preview" src="" alt="Vista previa foto puerta" style="max-width: 100%; height: auto; display: none;">
+                    </div>
+
+                    <!-- Departamento y Ciudad -->
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="departamento">Departamento</label>
+                            <select id="departamento" name="departamento" class="form-control" required="required">
+                                <option value="">----</option>
+                                {% for depa in departamento %}
+                                    <option value="{{ depa.id_depa }}">{{ depa.departamento }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="ciudad">Ciudad</label>
+                            <select id="ciudad" name="ciudad" class="form-control" required="required">
+                                <option value="">----</option>
+                                {% for ciu in ciudad %}
+                                <option value="{{ ciu.id_ciudad }}">{{ ciu.ciudad }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4 mt-4">
+                            <label class="col-form-label col-md-6 col-sm-6 label-align" for="telefono">Cuenta con Hijos
+                            </label>
+                            <p class="mt-2">
+                              Si:
+                              <input type="radio" class="flat " name="Hijo1" id="Hijo1" value="1" /> No:
+                              <input type="radio" class="flat " name="Hijo1" id="Hijo1" value="0" checked="" required />
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Contacto 1 -->
+                    <div class="form-row">
+                        <div class="form-group col-md-5">
+                            <label for="contacto_1">Nombre Contacto 1</label>
+                            <input type="text" id="contacto_1" name="contacto_1" class="form-control" required="required">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="grado_parentesco_1">Parentesco</label>
+                            <select name="grado_parentesco_1" id="grado_parentesco_1" class="form-control">
+                                <option value="">-----</option>
+                                <option value="Padre">Padre</option>
+                                <option value="Madre">Madre</option>
+                                <option value="Hermano/a">Hermano/a</option>
+                                <option value="Esposo/a">Esposo/a</option>
+                                <option value="Concubino">Concubino</option>
+                                <option value="Hijo/a">Hijo/a</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="telefono_1">Telefono</label>
+                            <input type="text" id="telefono_1" name="telefono_1" class="form-control" required="required">
+                        </div>
+                    </div>
+
+                    <!-- Contacto 2 -->
+                    <div class="form-row">
+                        <div class="form-group col-md-5">
+                            <label for="contacto_2">Nombre Contacto 2</label>
+                            <input type="text" id="contacto_2" name="contacto_2" class="form-control" required="required">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="grado_parentesco_2">Parentesco</label>
+                            <select name="grado_parentesco_2" id="grado_parentesco_2" class="form-control">
+                                <option value="">-----</option>
+                                <option value="Padre">Padre</option>
+                                <option value="Madre">Madre</option>
+                                <option value="Hermano/a">Hermano/a</option>
+                                <option value="Esposo/a">Esposo/a</option>
+                                <option value="Concubino">Concubino</option>
+                                <option value="Hijo/a">Hijo/a</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="telefono_2">Telefono</label>
+                            <input type="text" id="telefono_2" name="telefono_2" class="form-control" required="required">
+                        </div>
+                    </div>
+                    <input type="hidden" id="id_contacto" name="id_contacto" class="id_contacto">
+
+                    
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+    $('#editModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_empleo = button.data('id');   
+    
+    // Limpiar el contenedor de previsualización antes de agregar una nueva imagen
+    const previewContainer = document.getElementById('preview-container');
+    previewContainer.innerHTML = '';  // Limpiar el contenedor para evitar imágenes previas
+
+    $.ajax({
+        url: '/contactos/' + id_empleo + '/',   
+        method: 'GET',
+        success: function(data) {
+            $('#id_contacto').val(data.id_contacto);
+            $('#telefono').val(data.celular);
+            $('#longitud').val(data.longitud);
+            $('#direccion').val(data.direccion);
+            $('#latitud').val(data.latitud);
+            $('#contacto_1').val(data.contacto1_nombre);
+            $('#telefono_1').val(data.contacto1_numero);
+            $('#grado_parentesco_1').val(data.contacto1_parentesco);
+            $('#contacto_2').val(data.contacto2_nombre);
+            $('#telefono_2').val(data.contacto2_numero);
+            $('#grado_parentesco_2').val(data.contacto2_parentesco);
+            $('#ciudad').val(data.ciudad);
+            $('#departamento').val(data.departamento);
+            $('#Hijo1').val(data.hijos);
+
+            // Mostrar la imagen en el contenedor preview si hay foto
+            if (data.foto_puerta) {
+                const previewItem = document.createElement('div');
+                previewItem.classList.add('preview-item');
+
+                const img = document.createElement('img');
+                img.src = data.foto_puerta;  // Asignamos la URL de la foto
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '×';
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.onclick = () => previewItem.remove();
+
+                previewItem.appendChild(img);
+                previewItem.appendChild(deleteBtn);
+
+                // Añadimos la nueva vista previa al contenedor
+                previewContainer.appendChild(previewItem);
+            }
+            
+            if (data.estado) {
+                $('#estado_empleado').html('<li class="fa fa-check fa-2x" style="color: blue;"></li>');
+            } else {
+                $('#estado_empleado').html('<li class="fa fa-times fa-2x" style="color: red;"></li>');
+            }
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+});
+        
+</script>
+
+
+  
+
+<script>
+    // Script para actualizar la imagen en el modal con la imagen clickeada
+    const modal = document.getElementById('fotoModal');
+    modal.addEventListener('show.bs.modal', function (event) {
+        // Obtiene la imagen que se hizo clic (utiliza el atributo "data-img-url")
+        const clickedImage = event.relatedTarget;
+        const imageUrl = clickedImage.getAttribute('data-img-url');  // Obtiene la URL de la imagen
+
+        // Establece la URL de la imagen en el modal
+        const modalImage = modal.querySelector('#modalImage');
+        modalImage.src = imageUrl;  // Actualiza la imagen en el modal
+    });
+</script>
+
+  <style>
+    
+    .foto_puerta {
+      display: none; /* Ocultar el input por defecto */
+    }
+    
+    .preview-container {
+      
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+     
+    }
+    
+    .preview-item {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: rgba(255, 0, 0, 0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .delete-btn:hover {
+      background-color: rgba(255, 0, 0, 1);
+    }
+    
+    .delete-btn:focus {
+      outline: none;
+    }
+    
+</style>
+    <script>
+    const fileInput = document.getElementById('foto_puerta');
+    const previewContainer = document.getElementById('preview-container');
+
+    // Manejo de la selección de archivos desde el input
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    // Función para manejar los archivos
+    function handleFiles(files) {
+        for (let file of files) {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    // Crear la vista previa de la imagen
+                    const img = document.createElement('img');
+                    img.src = reader.result;
+
+                    // Crear el contenedor para la vista previa
+                    const previewItem = document.createElement('div');
+                    previewItem.classList.add('preview-item');
+
+                    // Crear el botón de eliminar
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '×';
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.onclick = () => previewItem.remove();
+
+                    // Añadir la imagen y el botón al contenedor de vista previa
+                    previewItem.appendChild(img);
+                    previewItem.appendChild(deleteBtn);
+
+                    // Añadir el contenedor de la vista previa al contenedor principal
+                    previewContainer.appendChild(previewItem);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Por favor, selecciona solo archivos de imagen.');
+            }
+        }
+    }
+</script>
+  
+
+{% endblock %}

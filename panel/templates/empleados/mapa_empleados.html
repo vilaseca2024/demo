@@ -1,0 +1,143 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+
+ 
+
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Empleados Ubicaciones</h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Mapa de Empleados</h2>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            {% if empleados %}
+            <input type="hidden" class="form-control" name="datosmapa" id="datosmapa" value="{{empleados}}"></input>
+            {% endif %}
+            <div id="map" style="height: 500px;"></div>
+
+            <br />
+            <label for="radioInput">Radio tolerancia (en metros):</label>
+            <input type="range" class="form-control" id="radioInput" value="100" min="10" max="1000" step="10" />
+            <p>Radio actual: <span id="radioValue">100</span> metros</p>
+
+            <div class="col-md-6">
+                <h3>Empleados con Tolerancia:</h3>
+                <table class="table table-hover" id="outsideTable" border="1">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Dirección</th>
+                            <th>Distancia (m)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h3>Empleados sin Tolerancia:</h3>
+               
+                   
+                <table class="table table-hover" id="insideTable" border="1">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Dirección</th>
+                            <th>Distancia (m)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+
+            <script>
+                // Centrar el mapa en La Paz, Bolivia con un nivel de zoom adecuado
+                var map = L.map('map').setView([-16.500000, -68.119295], 13);  // Coordenadas de La Paz y zoom 13
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                // Obtener los datos de empleados en formato JSON desde el textarea
+                var empleadosData = document.getElementById("datosmapa").value;
+
+                // Reemplazar las comillas simples por dobles (para convertir a JSON válido)
+                empleadosData = empleadosData.replace(/'/g, '"');
+
+                // Parsear el JSON corregido
+                var empleados = JSON.parse(empleadosData);
+
+                // Crear un círculo inicial con un radio por defecto
+                var circle = L.circle([-16.498288046507000, -68.13319022829610], {
+                    color: 'green',
+                    fillColor: 'green',
+                    fillOpacity: 0.5,
+                    radius: 100  // Radio inicial
+                }).addTo(map);
+                circle.bindTooltip('<b>OFICINA VILASECA</b>', { permanent: true, direction: "top" }).openTooltip();
+
+                // Función para actualizar el radio del círculo
+                function updateCircleRadius() {
+                    var radio = document.getElementById("radioInput").value;  // Obtener el valor del range
+                    circle.setRadius(radio * 10);  // Cambiar el radio del círculo
+                    document.getElementById("radioValue").textContent = radio * 10;  // Actualizar el texto con el radio actual
+                    // Volver a calcular las distancias y actualizar las tablas
+                    updateEmployeeTables();
+                }
+
+                // Asociar el evento 'input' al control deslizante para cambiar el radio del círculo
+                document.getElementById("radioInput").addEventListener("input", updateCircleRadius);
+
+                // Crear un array para almacenar los círculos de los empleados
+                var employeeMarkers = [];
+
+                empleados.forEach(function (empleado) {
+                    var marker = L.circleMarker([empleado.lat, empleado.lon], {
+                        color: "blue",
+                        radius: 8,
+                        fillOpacity: 1
+                    }).addTo(map);
+                    marker.bindPopup ("<b>" + empleado.nombre + "</b><br/>" + empleado.direccion, { permanent: true, direction: "top" }).openTooltip();
+                    // Almacenar el marcador para no eliminarlo más tarde
+                    employeeMarkers.push(marker);
+                });
+
+                // Función para actualizar las tablas de empleados dentro y fuera del círculo
+                function updateEmployeeTables() {
+                    // Limpiar las tablas antes de llenarlas
+                    document.querySelector("#insideTable tbody").innerHTML = "";
+                    document.querySelector("#outsideTable tbody").innerHTML = "";
+
+                    // Obtener las coordenadas del centro del círculo
+                    var circleCenter = circle.getLatLng();
+
+                    empleados.forEach(function (empleado, index) {
+                        var empleadoLatLng = L.latLng(empleado.lat, empleado.lon);
+                        var distance = circleCenter.distanceTo(empleadoLatLng); // Distancia en metros
+
+                        // Verificar si el empleado está dentro o fuera del círculo
+                        var tableRow = "<tr><td>" + empleado.nombre + "</td><td>" + empleado.direccion + "</td><td>" + distance.toFixed(2) + "</td></tr>";
+                        if (distance <= circle.getRadius()) {
+                            document.querySelector("#insideTable tbody").innerHTML += tableRow;
+                        } else {
+                            document.querySelector("#outsideTable tbody").innerHTML += tableRow;
+                        }
+                    });
+                }
+
+                // Llenar las tablas inicialmente
+                updateEmployeeTables();
+            </script>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

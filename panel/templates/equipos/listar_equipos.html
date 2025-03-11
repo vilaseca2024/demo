@@ -1,0 +1,721 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+
+<style>
+    
+    .foto_puerta {
+      display: none; /* Ocultar el input por defecto */
+    }
+    
+    .preview-container {
+      
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+     
+    }
+    
+    .preview-item {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: rgba(255, 0, 0, 0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .delete-btn:hover {
+      background-color: rgba(255, 0, 0, 1);
+    }
+    
+    .delete-btn:focus {
+      outline: none;
+    }
+    
+</style>
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Lista de Equipos <button class="btn btn-round btn-success " data-toggle="modal"
+            data-target=".bs-example-modal-lg"><li class="fa fa-plus"></li> Agregar Equipo</button></h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Inventario de Equipo de Oficina</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>Codigo de Equipo</th>
+                                    <th>Fecha de Registro</th>
+                                    <th>Nombre</th>
+                                    <th>Marca<br/>Modelo</th>
+                                   
+                                    <th>Tipo<br/>Tamano</th>
+                                    <th>Antiguo</th>
+                                    <th>QR's</th>
+                                    <th>Asignacion</th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">{{ dato.codigo_equipo }}</td>
+                                    <td class="text-center">{{ dato.fecha_registro }}</td>
+                                    <td class="text-center">{{ dato.nombre }}</td>
+                                    <td class="text-center">{{ dato.marca }}<br/>{{ dato.modelo }}</td>
+                                    <td class="text-center">{{ dato.tipo }}<br/>{{ dato.tamano }}</td>
+                                    <td class="text-center">
+                                        {% if dato.antiguo %}
+                                        <span class="badge badge-primary" >
+                                            Equipo Antiguo
+                                        </span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">
+                                            Equipo Nuevo
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        
+                                        <img src={{dato.qr}} alt="Sin Foto" class="img-thumbnail" style="height: auto; width: 150px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#fotoModal" data-img-url={{dato.qr}}>
+                                    </td>
+                                   
+                                    <td class="text-center">
+                                        {% if dato.activo == 1 %}
+                                        {% if dato.estado %}
+                                            {{dato.asignacion.empleado.first_name}} {{dato.asignacion.empleado.last_name}}
+                                        {% else %}
+                                           <a href="#"  
+                                           data-toggle="modal"
+                                           data-target="#asignar"
+                                           data-id="{{ dato.id_equipo }}"  > 
+                                           <span class="badge badge-danger" style="font-size: 12px;"><li class="fa fa-cog"></li><br/> Sin Asignar</span> </a>
+                                        {% endif %}
+                                        {% else %}
+                                        Equipo Desactivado
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="ver_equipo/{{dato.id_equipo}}">
+                                            <button class="btn btn-secondary btn-sm">
+                                                <li class="fa fa-eye"></li>  
+                                            </button>
+                                        </a>
+                                       
+                                      
+                                        <button class="btn btn-success btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#editModal"
+                                                data-id="{{ dato.id_equipo }}"  >
+                                            <li class="fa fa-edit"></li>  
+                                        </button>
+                                  
+
+                                       
+                                     
+                                        {% if dato.estado == True %}
+                                        
+                                            <button class="btn btn-primary btn-sm" 
+                                                    data-toggle="modal" 
+                                                    data-target="#devolver"
+                                                    data-id="{{ dato.id_equipo }}"  > 
+                                                    <a  
+                                                        data-toggle="tooltip" 
+                                                        data-placement="top" title="" 
+                                                        data-original-title="Presiona para registrar la devolucion del equipo">
+                                                        <li class="fa fa-undo"></li>  
+                                                    </a>
+                                            </button>
+                                       
+                                        {% endif %}
+
+
+                                        {% if dato.activo == 1 %}
+                                            <button class="btn btn-danger btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#eliminar"
+                                            data-id="{{ dato.id_equipo }}"  >
+                                                <li class="fa fa-trash"></li>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-info btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#activar"
+                                            data-id="{{ dato.id_equipo }}"  >
+                                                <li class="fa fa-plus-square-o"></li>
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL PARA AGREGAR  -->
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="agregar_equipo" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar nuevo Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="nombre_equipo">Identificicador Equipo</label>
+                            <input type="text" id="nombre_equipo" name="nombre_equipo" class="form-control"required>
+                        </div>
+                        <div class="form-group col-md-4 ">
+                            <label for="marca">Marca</label>
+                            <input type="text" id="marca" name="marca" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="modelo">Modelo</label>
+                            <input type="text" id="modelo" name="modelo" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        
+                        <div class="form-group col-md-4">
+                            <label for="tipo">Tipo de Equipo</label>
+                            <select class="form-control" id="tipo" name="tipo">
+                                <option value="">Seleccione un tipo</option>
+                                <option value="Portatil">Portatil</option>
+                                <option value="Equipo de Escritorio">Equipo de Escritorio</option>
+                                <option value="Camaras">Camaras</option>
+                                <option value="Redes">Redes</option>
+                                <option value="Impresoras y Escaners">Impresoras y Escaners</option>
+                                <option value="Periferico Externo">Periferico Externo</option>
+                                <option value="Servidor">Servidor</option>
+                            </select>
+                            
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="tamano">Tamaño</label>
+                            <select class="form-control" id="tamano" name="tamano">
+                                <option value="">----------</option>
+                                <option value="Grande">Grande</option>
+                                <option value="Mediano">Mediano</option>
+                                <option value="Pequeno">Pequeño</option>
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="fecha_registro">Fecha de Compra</label>
+                            <input type="date" id="fecha_registro" name="fecha_registro" class="form-control" required>
+                        </div>
+                         
+                    </div>
+
+                    <div class="form-row">
+                  
+                        <div class="form-group col-md-8">
+                            <label for="tamano">Fotos del equipo (5 fotos)</label>
+                            <input type="file" id="fotos" name="fotos" class="form-control" multiple accept="image/*" required>
+                        </div>
+                        
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="descripcion">Descripcion</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+
+                        </div>
+                        <div class="col-md-6 ">
+                            <label for="componentes">Componentes Adicionales</label>
+                            <input id="tags_1" name="componentes" type="text" class="tags form-control" value="Teclado, Mouse" />
+                            <div id="suggestions-container" style="position: relative; float: left;  margin: 10px;"></div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-row">
+                        
+                     
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- MODAL PARA VER FOTO DE UNA IMAGEN -->
+<div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fotoModalLabel">QR de Equipo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal2" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Imagen no Encontrada" class="img-fluid" style="width: 400px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA ASIGNAR EQUIPO A EMPLEADO -->
+<div class="modal fade bs-example-modal-lg-asignar" id="asignar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="asignar_equipo" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Asignar Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="codigo_equipo">Equipo </label>
+                            <input type="text" id="codigo_equipo" name="codigo_equipo" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="marca">Empleado (*)</label>
+                            <select class="selectize" id="empleado_asignado" name="empleado_asignado" required>
+                                <option value="">-------------</option>
+                                {%for usuario in usuarios%}
+                                    <option value="{{usuario.id}}">{{usuario.first_name}} {{usuario.last_name }}</option>
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="asignacion">Fecha de Asignacion (*)</label>
+                            <input type="date" id="asignacion" name="asignacion" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="devolucion">Fecha de Devolucion</label>
+                            <input type="date" id="devolucion" name="devolucion" class="form-control" >
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="detalle">Detalle</label>
+                            <textarea name="detalle" id="detalle" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- MODAL PARA DEVOLVER UN EQUIPO -->
+<div class="modal fade bs-example-modal-lg-asignar" id="devolver" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="devolver_equipo" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Devolucion de Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="codigo_equipo_devolver">Equipo </label>
+                            <input type="text" id="codigo_equipo_devolver" name="codigo_equipo_devolver" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="empleado_devolver">Empleado</label>
+                            <input type="hidden" id="empleado_devolver" name="empleado_devolver" class="form-control" readonly>
+                            <input type="text" id="empleado_devolver_nombre" name="empleado_devolver_nombre" class="form-control" readonly>
+                        </div>
+                    
+                        <div class="form-group col-md-12">
+                            <label for="observacion_devolver">Detalle</label>
+                            <textarea name="observacion_devolver" id="observacion_devolver" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<!-- MODAL PARA EDITAR REGISTRO -->
+<div class="modal fade bs-example-modal-lg" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="editar_equipo" method="POST" id="demo-form6"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Editar Informacion de Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="nombre_equipo_editar">Identificicador Equipo</label>
+                            <input type="text" id="nombre_equipo_editar" name="nombre_equipo_editar" class="form-control"required>
+                            <input type="hidden" id="id_equipo" name="id_equipo" class="form-control">
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            <label for="marca_editar">Marca</label>
+                            <input type="text" id="marca_editar" name="marca_editar" class="form-control" required>
+                        </div>
+                       
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="modelo_editar">Modelo</label>
+                            <input type="text" id="modelo_editar" name="modelo_editar" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="tipo_editar">Tipo de Equipo</label>
+                            <select class="form-control" id="tipo_editar" name="tipo_editar">
+                                <option value="">----------</option>
+                                <option value="Portatil">Portatil</option>
+                                <option value="Equipo de Escritorio">Equipo de Escritorio</option>
+                                <option value="Cableado">Cableado</option>
+                                <option value="Redes">Redes</option>
+                                <option value="Equipo Complementario">Equipo Complementario</option>
+                            </select>
+                            
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="tamano_editar">Tamaño</label>
+                            <select class="form-control" id="tamano_editar" name="tamano_editar">
+                                <option value="">----------</option>
+                                <option value="Grande">Grande</option>
+                                <option value="Mediano">Mediano</option>
+                                <option value="Pequeno">Pequeño</option>
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="fecha_registro_editar">Fecha de Compra</label>
+                            <input type="date" id="fecha_registro_editar" name="fecha_registro_editar" class="form-control" required>
+                        </div>
+                         
+                    </div>
+
+                    <div class="form-row">
+                  
+                        <div class="form-group col-md-12">
+                            <label for="fotos_editar">Fotos del equipo (5 fotos)</label>
+                            <input type="file" id="fotos_editar" name="fotos_editar" class="form-control" multiple accept="image/*" >
+                        </div>
+                        
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="descripcion_editar">Descripcion</label>
+                            <textarea class="form-control" id="descripcion_editar" name="descripcion_editar" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+
+                        </div>
+                      
+                    
+                        
+                    </div>
+
+                    
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="eliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="eliminar_equipo" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Confirmar desactivar este equipo del sistema?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_eliminar" id="id_eliminar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Desactivar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="activar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="activar_equipo" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-plus-square-o"></li>
+                        <h4 class="mt-2">Confirmar Activar este equipo en el sistema?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_activar" id="id_activar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Activar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $('#eliminar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_eliminar').val(id_datos);
+    });
+    $('#activar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_activar').val(id_datos);
+    });
+
+ 
+       $(document).ready(function() {
+        $('#empleado_asignado').selectize(); 
+         
+    });
+    $('#asignar').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_empleo = button.data('id');   
+   
+    $.ajax({
+        url: '/obtener_datos_equipo/' + id_empleo + '/',   
+        method: 'GET',
+        success: function(data) {
+            $('#codigo_equipo').val(data.codigo_equipo);
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+
+$('#devolver').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_empleo = button.data('id');   
+   
+    $.ajax({
+        url: '/obtener_datos_equipo2/' + id_empleo + '/',   
+        method: 'GET',
+        success: function(data) {
+            $('#codigo_equipo_devolver').val(data.codigo_equipo_devolver);
+            $('#empleado_devolver').val(data.empleado_id);
+            $('#empleado_devolver_nombre').val(data.empleado)
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+
+
+$('#editModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');   
+   
+    $.ajax({
+        url: '/info_equipos_editar/' + id_datos + '/',   
+        method: 'GET',
+        success: function(data) {
+            
+            
+            $('#id_equipo').val(data.id_equipo);
+            $('#marca_editar').val(data.marca);
+            $('#nombre_equipo_editar').val(data.nombre);
+            $('#descripcion_editar').val(data.descripcion)
+            $('#tipo_editar').val(data.tipo);
+            $('#modelo_editar').val(data.modelo)
+            $('#tamano_editar').val(data.tamano);
+            $('#fecha_registro_editar').val(data.fecha_compra);
+            $('#componentes_editar').val(data.auxiliares)
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+        
+</script>
+
+
+  
+
+<script>
+    // Script para actualizar la imagen en el modal con la imagen clickeada
+    const modal = document.getElementById('fotoModal');
+    modal.addEventListener('show.bs.modal', function (event) {
+        // Obtiene la imagen que se hizo clic (utiliza el atributo "data-img-url")
+        const clickedImage = event.relatedTarget;
+        const imageUrl = clickedImage.getAttribute('data-img-url');  // Obtiene la URL de la imagen
+
+        // Establece la URL de la imagen en el modal
+        const modalImage = modal.querySelector('#modalImage');
+        modalImage.src = imageUrl;  // Actualiza la imagen en el modal
+    });
+</script>
+
+  
+    <script>
+    const fileInput = document.getElementById('foto_puerta');
+    const previewContainer = document.getElementById('preview-container');
+
+    // Manejo de la selección de archivos desde el input
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    // Función para manejar los archivos
+    function handleFiles(files) {
+        for (let file of files) {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    // Crear la vista previa de la imagen
+                    const img = document.createElement('img');
+                    img.src = reader.result;
+
+                    // Crear el contenedor para la vista previa
+                    const previewItem = document.createElement('div');
+                    previewItem.classList.add('preview-item');
+
+                    // Crear el botón de eliminar
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '×';
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.onclick = () => previewItem.remove();
+
+                    // Añadir la imagen y el botón al contenedor de vista previa
+                    previewItem.appendChild(img);
+                    previewItem.appendChild(deleteBtn);
+
+                    // Añadir el contenedor de la vista previa al contenedor principal
+                    previewContainer.appendChild(previewItem);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Por favor, selecciona solo archivos de imagen.');
+            }
+        }
+    }
+
+ 
+</script>
+  
+
+{% endblock %}

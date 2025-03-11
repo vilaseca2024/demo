@@ -1,0 +1,146 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+
+ <div class=" " role="main">
+  
+   
+      <div class="">
+ 
+        <div class="animated flipInY col-lg-3 col-md-3  ">
+            <br/>
+          <a href="empleados">
+            <div class="tile-stats">
+              <div class="icon"><i class="fa fa-users"></i></div>
+              <div class="count">{{total_usuarios}}</div>
+              <br/>
+              <h3>Usuarios</h3>
+              <p>Modulo de Gestion de Usuarios</p>
+            </div>
+          </a>
+        </div>
+        <div class="animated flipInY col-lg-3 col-md-3  ">
+            <br/>
+            <a href="solicitud_admi">
+              <div class="tile-stats">
+                <div class="icon"><i class="fa fa-paperclip"></i></div>
+                <div class="count">{{total_solicitudes}}</div>
+                <br/>
+                <h3>Solicitudes</h3>
+                <p>Certificados de Trabajo sin Evaluar</p>
+              </div>
+            </a>
+            
+          </div>
+          <div class="animated flipInY col-lg-3 col-md-3  ">
+            <br/>
+            <a href="certificado">
+              <div class="tile-stats">
+                <div class="icon"><i class="fa fa-newspaper-o"></i></div>
+                <div class="count">{{total_certificados}}</div>
+                <br/>
+                <h3>Certificados </h3>
+                <p>Certificados de Trabajo Aprobados</p>
+              </div>
+            </a>
+            
+          </div>
+          <div class="animated flipInY col-lg-3 col-md-3  ">
+            <br/>
+            <a href="documento">
+              <div class="tile-stats">
+                <div class="icon"><i class="fa fa-files-o"></i></div>
+                <div class="count">{{total_documentos}}</div>
+                <br/>
+                <h3>Documentos - File</h3>
+                <p>File de Empleados</p>
+              </div>
+            </a>
+            
+          </div>
+      </div>
+      <br />
+      <div class="row">
+        
+        <div class="col-md-6 col-sm-6 ">
+            <div class="x_panel tile fixed_height_320">
+                <div class="x_title">
+                    <h2>Porcentaje General de Perfiles Completados</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="#">Settings 1</a>
+                                <a class="dropdown-item" href="#">Settings 2</a>
+                            </div>
+                        </li>
+                        <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="dashboard-widget-content">
+                        <ul class="quick-list">
+                          <li><i class="fa fa-user"></i><a href="empleados">Credenciales y Usuarios</a></li>
+                          <li><i class="fa fa-language"></i><a href="roles">Roles y Permisos</a></li>  
+                          <li><i class="fa fa-users"></i><a href="lista_empleados">Datos Personales en General</a></li>
+                          <li><i class="fa fa-folder-o"></i><a href="personal_actual">Datos de Contactos del Personal</a></li>
+                          <li><i class="fa fa-laptop"></i><a href="datos_contrato">Datos de Contratación </a></li>
+                          <li><i class="fa fa-files-o"></i><a href="documento">Documentos Personales (FILE)</a></li>
+                        </ul>
+    
+                        <div class="sidebar-widget">
+                            <h4>Perfiles Completos</h4>
+                             
+                            <canvas width="280" height="150" id="chart_gauge_01" class="" style="width: 460px; height: auto;"></canvas>
+                            <div class="goal-wrapper">
+                                <span id=" " class="gauge-value pull-left">{{ porcentaje|floatformat:2 }}</span>
+                                <span class="gauge-value pull-left">%</span>
+                                <span id=" " class="goal-value pull-right">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+   
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const porcentaje = parseFloat("{{ porcentaje|floatformat:2 }}"); 
+
+      const ctx = document.getElementById('chart_gauge_01').getContext('2d');
+      const gaugeChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+              labels: ['Completado', 'Restante'],
+              datasets: [{
+                  data: [porcentaje, 100 - porcentaje],
+                  backgroundColor: ['#26B99A', '#EDEDED'],
+                  hoverBackgroundColor: ['#26B99A', '#EDEDED']
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: true,  
+              cutout: '70%',  
+              rotation: -Math.PI, 
+              circumference: Math.PI, 
+              plugins: {
+                  legend: {
+                      display: false  
+                  }
+              }
+          }
+      });
+  });
+</script>
+
+
+{% endblock %}

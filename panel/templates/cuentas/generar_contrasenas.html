@@ -1,0 +1,1145 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+
+<a id="success-link" style="display:none;" onclick="new PNotify({
+    title: 'Mensaje de Éxito',
+    text: 'Se registro y guardo la CUENTA DE CORREO correctamente.',
+    type: 'success',
+    icon: 'fa fa-check-circle fa-2x',  
+    styling: 'bootstrap3'
+}); ">Posi</a>
+
+<a id="error-link" style="display:none;" onclick="new PNotify({
+    title: 'Oh No!',
+    text: 'Ocurrió un error al guardar los datos.',
+    type: 'error',
+    icon: 'fa fa-exclamation-triangle fa-2x', 
+    styling: 'bootstrap3'
+});">Error</a>
+
+<a id="editar-link" style="display:none;" onclick="new PNotify({
+    title: 'Datos Editados',
+    text: 'Los datos editados se registraron y guardaron correctamente.',
+    icon: 'fa fa-edit fa-2x',  
+    styling: 'bootstrap3',
+});">Editar</a>
+
+<a id="asignar-link" style="display:none;" onclick="new PNotify({
+    title: 'Empleado Asignado',
+    text: 'Se asigno la CUENTA DE CORREO correctamente.',
+    type: 'info',
+    styling: 'bootstrap3',
+    addclass: 'dark',
+    icon: 'fa fa-user fa-2x',  
+    
+});">Asignar</a>
+
+
+<a id="devolver-link" style="display:none;" onclick="new PNotify({
+    title: 'Baja Cuenta',
+    text: 'Se dio de BAJA la CUENTA DE CORREO correctamente.',
+    type: 'info',
+    styling: 'bootstrap3',
+    icon: 'fa fa-refresh fa-2x',  
+    
+});">Devolver</a>
+
+<a id="activar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Activado',
+    text: 'Se activo el registro correctamente.',
+    type: 'info',
+    styling: 'bootstrap3',
+    icon: 'fa fa-plus-circle fa-2x',  
+    
+});">activar</a>
+
+<a id="desactivar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Desactivado',
+    text: 'Se desactivo el registro correctamente.',
+    type: 'error',
+    icon: 'fa fa-trash-o fa-2x', 
+    styling: 'bootstrap3'
+});">desactivar</a>
+
+
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Gestor de Correos Electronicos <button class="btn btn-round btn-success " data-toggle="modal"
+            data-target="#agregar_nuevo_correo"><li class="fa fa-plus"></li> Agregar Cuenta</button></h3>
+        <br>
+    </div>
+</div>
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listado de Correos Electronicos</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="d-flex justify-content-end mx-3">
+            <button class="btn btn-info" data-target="#cambios" data-toggle="modal" id="enviar-seleccionados"><li class="fa fa-refresh"></li> Cambiar Datos</button>
+            <button class="btn btn-secondary" data-target="#informe" data-toggle="modal" id="datoInforme"><li class="fa fa-file-text-o"></li> Informe</button>
+        
+        
+        </div>
+       
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    
+                    <div class="card-box table-responsive">
+                        <table id="datatable-checkbox" class="table table-striped table-bordered bulk_action" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th><input type="checkbox" id="check-all" ></th>
+                                    <th>#</th>
+                                    <th>fecha</th>
+                                    <th>Correo Alias<br/>(Correo Principal)</th>
+                                    <th>Tipo</th>
+                                     
+                                    <th>Empleado Asignado</th>
+                                    <th>Opciones para Asignar</th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td>
+                                        {% if dato.correo_alt %}
+                                        {% else %}
+                                        <input type="checkbox" class="check-item" value="{{ dato.id_u_correo }}">
+                                        {% endif %}
+                                    </td>
+                                    <td>{{dato.id_u_correo}}</td>
+                                    <td class="text-center">{{dato.fecha}}</td>
+                                    {% if dato.correo_alt %}
+                                        <td class=""><b>{{ dato.correo_alt }}</b><br/> ({{ dato.correo_usuario }})</td>
+                                    {% else %}
+                                        <td class=""><b>{{ dato.correo_usuario }}</b><br/>(Cuenta Principal)</td>
+                                    {% endif %}
+                                    <td class="text-center">{{ dato.tipo }} </td>
+                                  
+                                    <td class="text-center">{{ dato.asignado.empleado.first_name }} {{ dato.asignado.empleado.last_name }} </td>
+                                    <td class="text-center">
+                                        {% if dato.estado == 0 %}
+                                            {% if dato.compartido == True %}
+                                            <a href="#"  
+                                            data-toggle="modal"
+                                            data-target="#asignar_multi"
+                                            data-id="{{ dato.id_u_correo }}"  > 
+                                            <span class="badge badge-warning" style="font-size: 12px;"
+                                                data-toggle="tooltip" 
+                                                data-placement="left" 
+                                                 
+                                                data-original-title="Este correo se encuentra SIN ASIGNAR, presione para asignar un empleado" >
+                                            <li class="fa fa-wrench"></li><br/> Sin Asignar</span> </a>
+                                            {% else %}
+                                            <a href="#"  
+                                            data-toggle="modal"
+                                            data-target="#asignar_uni"
+                                            data-id="{{ dato.id_u_correo }}"  > 
+                                          
+                                            <span class="badge badge-warning" style="font-size: 12px;"
+                                            data-toggle="tooltip" 
+                                            data-placement="left" 
+                                             
+                                            data-original-title="Este correo se encuentra SIN ASIGNAR, presione para asignar un empleado" >
+                                            <li class="fa fa-cog"></li><br/> Sin Asignar</span> </a>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if dato.compartido == True and dato.estado == 2 %}
+                                                <a href="#"  
+                                                data-toggle="modal"
+                                                data-target="#asignar_multi"
+                                                data-id="{{ dato.id_u_correo }}"  > 
+                                                <span class="badge badge-secondary" style="font-size: 12px;"
+                                                data-toggle="tooltip" 
+                                                data-placement="left" 
+                                                 
+                                                data-original-title="Este correo puede contar con VARIOS ALIAS presione para asignar uno NUEVO" >
+                                                <li class="fa fa-cogs"></li><br/> Asignar Nuevo</span> </a>
+                                            {% endif %}
+                                            {% if dato.compartido == False and dato.estado == 1 %}
+ 
+                                            <a href="#"  
+                                            data-toggle="tooltip" 
+                                            data-placement="left" 
+                                             
+                                            data-original-title="Este correo solo cuenta con una cuenta principal que ya fue asignada a un empleado" >
+                                            <span class="badge badge-success" style="font-size: 12px;"><li class="fa fa-check"></li><br/> Cuenta Asignada</span>  </a>
+         
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="">
+                                        <button class="btn btn-success btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#editModal"
+                                                data-id="{{ dato.id_u_correo }}"  >
+                                            <li class="fa fa-edit"></li>  
+                                        </button>
+                                        {% if dato.activo == 1 %}
+                                            <button class="btn btn-danger btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#eliminar"
+                                            data-id="{{ dato.id_u_correo }}"  >
+                                                <li class="fa fa-trash"></li>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-info btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#activar"
+                                            data-id="{{ dato.id_u_correo }}"  >
+                                                <li class="fa fa-plus-square-o"></li>
+                                            </button>
+                                        {% endif %}
+                                        {% if dato.correo_alt %}
+
+                                        {% else %}
+                                        <a data-toggle="tooltip" data-placement="left" title="" data-original-title="Al presionar se enviara al administrador un codigo de verificacion">
+                                            <button class="btn btn-primary btn-sm"  id="codificar"
+                                                    data-toggle="modal" 
+                                                    data-target="#credencial"
+                                                    data-id="{{ dato.id_u_correo }}"  >
+                                                <li class="fa fa-key"></li>  
+                                            </button>
+                                        </a>
+                                        {% endif %}
+                                        
+                                        
+                                        {% if dato.estado == 1 %}
+                                        
+                                            <button class="btn btn-secondary btn-sm" 
+                                                    data-toggle="modal" 
+                                                    data-target="#devolver_uni"
+                                                    data-id="{{ dato.id_u_correo }}"  > 
+                                                    <a  
+                                                        data-toggle="tooltip" 
+                                                        data-placement="top" title="" 
+                                                        data-original-title="Presiona para registrar la baja del correo">
+                                                        <li class="fa fa-undo"></li>  
+                                                    </a>
+                                            </button>
+                                       
+                                        {% endif %}
+                                        {% if dato.estado == 2 %}
+                                        
+                                            <button class="btn btn-secondary btn-sm" 
+                                                    data-toggle="modal" 
+                                                    data-target="#devolver_multi"
+                                                    data-id="{{ dato.id_u_correo }}"  > 
+                                                    <a  
+                                                        data-toggle="tooltip" 
+                                                        data-placement="top" title="" 
+                                                        data-original-title="Presiona para registrar la baja del correo">
+                                                        <li class="fa fa-undo"></li>  
+                                                    </a>
+                                            </button>
+                                       
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+<div class="modal fade bs-example-modal-lg-asignar" id="devolver_uni" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="completar_devolucion" method="POST"   enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Dar de Baja a usuario de Correo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="correo_uni">Correo </label>
+                            <input type="text" id="devolver_correo_uni" name="devolver_correo_uni" class="form-control" readonly>
+                            <input type="hidden" id="devolver_id_correo_uni" name="devolver_id_correo_uni" class="form-control">
+                            
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="correo_multi">Correo Alias</label>
+                            <input type="email" id="devolver_correo_uni_alt" name="devolver_correo_uni_alt" class="form-control" readonly>
+                        </div>
+                        
+                        <div class="form-group col-md-12 ">
+                            <label for="marca">Empleado (*)</label>
+                            <input class="form-control" id="empleado_devolver_uni" name="empleado_devolver_uni" readonly>
+                            <input type="hidden" id="empleadoid_devolver_uni" name="empleadoid_devolver_uni" readonly>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="devolver_clasificacion_uni">Clasificacion de Alias</label>
+                            <input type="text" id="devolver_clasificacion_uni" name="devolver_clasificacion_uni" class="form-control" readonly value="Cuenta con solo 1 Asignado">
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="detalle_uni">Observaciones</label>
+                            <textarea name="devolver_detalle_uni" id="devolver_detalle_uni" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<!-- MODAL PARA EDITAR  -->
+<div class="modal fade bs-example-modal-lg" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="editar_cuenta_correo" method="POST" id="demo-form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Editar Cuenta de Usuario</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body mt-2">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="correo"> Correo</label>
+                            <input type="email" id="correo_editar" name="correo_editar" class="form-control" required> 
+                            <input type="hidden" id="id_editar" name="id_editar" class="form-control" required> 
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="tipo">Tipo</label>
+                            <select id="tipo_editar" name="tipo_editar" class="form-control" style="width: 100%;">
+                                <option value="">Selecciona una tipo</option>
+                                <option value="DOMINIO">DOMINIO</option>
+                                <option value="GMAIL">GMAIL</option>
+                                <option value="HOTMAIL">HOTMAIL</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="alias_correo"> Cantidad de Alias</label>
+                            <select id="alias_correo_editar" name="alias_correo_editar" class="form-control" style="width: 100%;">
+                                <option value="">Selecciona una opción </option>
+                                <option value="0">Sin Alias - Solo un Empleado</option>
+                                <option value="1">Multiples Alias - Varios Empleados</option>
+                                 
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="fecha_asignado">Fecha Creacion</label>
+                            <input type="date" id="fecha_asignado_editar" name="fecha_asignado_editar" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea class="form-control" id="observaciones_editar" name="observaciones_editar" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="agregar_nuevo_correo" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="agregar_usuario_correo" method="POST" id="demo-form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar nueva Cuenta de Usuario</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body mt-2">
+                    <div class="form-row">
+                       
+                        <div class="form-group col-md-12">
+                            <label for="correo"> Correo</label>
+                            <input type="email" id="correo" name="correo" class="form-control" required> 
+                        </div>
+                        
+                        <div class="form-group col-md-4">
+                            <label for="tipo">Tipo</label>
+                            <select id="tipo" name="tipo" class="selectize" style="width: 100%;">
+                                <option value="">Selecciona una tipo</option>
+                                <option value="DOMINIO">DOMINIO</option>
+                                <option value="GMAIL">GMAIL</option>
+                                <option value="HOTMAIL">HOTMAIL</option>
+                            </select>
+                        </div>
+                        
+                        
+                        <div class="form-group col-md-4">
+                            <label for="alias_correo"> Cantidad de Alias</label>
+                            <select id="alias_correo" name="alias_correo" class="selectize" style="width: 100%;">
+                                <option value="">Selecciona una opción </option>
+                                <option value="0">Sin Alias - Solo un Empleado</option>
+                                <option value="1">Multiples Alias - Varios Empleados</option>
+                                 
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4 ">
+                            <label for="fecha_asignado">Fecha Creacion</label>
+                            <input type="date" id="fecha_asignado" name="fecha_asignado" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="password">Contraseña</label>
+                            <input type="text" id="password" name="password" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="password_confirmar">Confirmar Contraseña</label>
+                            <input type="text" id="password_confirmar" name="password_confirmar" class="form-control" required>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <button type="button" class="btn btn-success mt-4" id="generar"><li class="fa fa-key"></li> Generar Contraseña</button>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea class="form-control" id="observaciones" name="observaciones" style="height: 100px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div class="modal fade bs-example-modal-lg" id="credencial" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="verificar_codigo/" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row "> 
+                        <input type="hidden" id="data-id-hidden" name="data_id">
+                        <div class="text-center mt-4">
+                            <li class="fa fa-5x fa-exclamation-triangle"></li>
+                            <h4 class="mt-2">El acceso para esta informacion es restringido para visualizarlo debe ingresar el codigo enviado al correo del administrador principal</h4>
+                        </div>
+                         
+                        <div class="item form-group mt-4">
+                            <label class="col-form-label col-md-7 col-sm-7 label-align" for="codigo_ingresado">Ingresa el Código</label>
+                            <div class="col-md-5 col-sm-5">
+                                <input type="text" id="codigo_ingresado" name="codigo_ingresado" required="required" class="form-control" placeholder="X_X_X_X_X_X_X_X">
+                            </div>
+                            <label class="col-form-label col-md-5 col-sm-5" for="codigo_ingresado">Tiempo restante: 0<span id="tiempo-restante">1:30</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Verificar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="datos" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+          
+            <div class="modal-body">
+                <div class="d-flex justify-content-center align-items-center" style="height: 100%; flex-direction: column;">
+                    <div class="text-center">
+                        <li class="fa fa-5x fa-key"></li>
+                        <h4 class="mt-2">Dato obtenido:</h4>
+                        <h3 id="codigo-verificado" class="mt-2"></h3> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="cambios" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="check_marcados" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Estas seguro de cambiar los registros seleccionados?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="ids_seleccionados" id="ids_seleccionados">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Cambiar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="informe" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="check_informe" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Estas seguro de enviar un informe de los registros seleccionados?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="ids_seleccionados_info" id="ids_seleccionados_info">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Informe</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg-asignar" id="asignar_uni" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="asignar_correo_uni" method="POST"   enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Asignar Correo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="correo_uni">Correo </label>
+                            <input type="text" id="correo_uni" name="correo_uni" class="form-control" readonly>
+                            <input type="hidden" id="id_correo_uni" name="id_correo_uni" class="form-control">
+                        
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="asignacion_alias_uni">Correo </label>
+                            <input type="text" id="asignacion_alias_uni" name="asignacion_alias_uni" class="form-control" readonly>
+                          
+                        
+                        </div>
+                        
+                        <div class="form-group col-md-12 ">
+                            <label for="marca">Empleado (*)</label>
+                            <select class="selectize" id="select_empleado_1" name="select_empleado_1" required>
+                                <option value="">Seleccione un empleado</option>
+                                {%for usuario in usuarios%}
+                                    <option value="{{usuario.id}}">{{usuario.first_name}} {{usuario.last_name }}</option>
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="asignacion_uni">Fecha de Asignacion (*)</label>
+                            <input type="date" id="asignacion_uni" name="asignacion_uni" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="clasificacion_uni">Clasificacion de Alias</label>
+                            <input type="text" id="clasificacion_uni" name="clasificacion_uni" class="form-control" readonly value="Asignar 1 solo Empleado">
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="detalle_uni">Detalle</label>
+                            <textarea name="detalle_uni" id="detalle_uni" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="asignar_multi" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="asignar_correo_multi" method="POST"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Asignar Correo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="correo_multi">Correo </label>
+                            <input type="email" id="correo_multi" name="correo_multi" class="form-control" readonly>
+                            <input type="hidden" id="id_correo_multi" name="id_correo_multi" class="form-control">
+                        </div>
+                        
+                        <div class="form-group col-md-12 ">
+                            <label for="marca">Empleado (*)</label>
+                            <select class="selectize" id="select_empleado_2" name="select_empleado_2" required>
+                                <option value="">Seleccione un empleado</option>
+                                {%for usuario in usuarios%}
+                                    <option value="{{usuario.id}}">{{usuario.first_name}} {{usuario.last_name }}</option>
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="correo-alias_multi">Correo Alias </label>
+                            <input type="email" id="correo-alias_multi" name="correo-alias_multi" class="form-control" >
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="asignacion_multi">Fecha de Asignacion (*)</label>
+                            <input type="date" id="asignacion_multi" name="asignacion_multi" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="clasificacion_multi">Clasificacion de Alias</label>
+                            <input type="text" id="clasificacion_multi" name="clasificacion_multi" class="form-control" readonly value="Varios empleados Asignados">
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="detalle_multi">Detalle</label>
+                            <textarea name="detalle_multi" id="detalle_multi" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+ 
+
+<div class="modal fade bs-example-modal-lg-asignar" id="devolver_multi" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="" method="POST"   enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Dar de Baja a usuario de Correo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                     
+                            <label for="correo_uni">Correo </label>
+                            <input type="text" id="devolver_correo_multi" name="devolver_correo_multi" class="form-control" readonly>
+                            <input type="hidden" id="devolver_id_correo_multi" name="devolver_id_correo_multi" class="form-control">
+                        </div>
+                        
+                        <div class="form-group col-md-12 ">
+                            <label for="marca">Empleado (*)</label>
+ 
+                            <select class="selectize" id="empleado_devolver_multi" name="empleado_devolver_multi" required>
+                                <option value="">Seleccione un empleado</option>
+                                {%for asig in asignados %}
+                                    <option value="{{asig.empleado.id}}">{{asig.empleado.first_name}} {{asig.empleado.last_name }}</option>
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="correo_devolver_alias">Alias</label>
+                            <input type="email" id="correo_devolver_alias" name="correo_devolver_alias" class="form-control" readonly >
+                        </div>
+                       
+                        <div class="form-group col-md-12">
+                            <label for="devolver_clasificacion_uni">Clasificacion de Alias</label>
+                            <input type="text" id="devolver_clasificacion_multi" name="devolver_clasificacion_multi" class="form-control" readonly placeholder="Cuenta con mas de 1 asignado">
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="detalle_multi">Observaciones</label>
+                            <textarea name="devolver_detalle_multi" id="devolver_detalle_multi" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="eliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="eliminar_cuentas_email" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Confirma si deseas desactivar esta Cuenta de Correo?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_eliminar" id="id_eliminar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Desactivar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="activar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="activar_cuentas_email" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-plus-square-o"></li>
+                        <h4 class="mt-2">Confirma si deseas Activar esta Cuenta de Correo?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_activar" id="id_activar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Activar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    $('#eliminar').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');    
+    $('#id_eliminar').val(id_datos);
+    });
+    $('#activar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_activar').val(id_datos);
+    });
+    $('#asignar_uni').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id = button.data('id');   
+    
+        $.ajax({
+            url: '/obtener_datos_correo_uni/' + id + '/',   
+            method: 'GET',
+            success: function(data) {
+                $('#correo_uni').val(data.correo_encontrado);
+                $('#id_correo_uni').val(data.id_correo_uni);
+                $('#asignacion_alias_uni').val(data.id_correo_alt_uni);
+                
+            },
+            error: function(xhr, errmsg, err) {
+                console.log("Error: " + errmsg);
+            }
+        });
+        
+    });
+
+
+
+    
+    $('#devolver_uni').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id = button.data('id');   
+        var msj = 'Sin alias'
+        $.ajax({
+            url: '/devolver_datos_uni/' + id + '/',   
+            method: 'GET',
+            success: function(data) {
+                $('#devolver_correo_uni').val(data.correo_usuario);
+                $('#empleado_devolver_uni').val(data.empleado);
+                $('#devolver_id_correo_uni').val(data.id_correo_devolver);
+                $('#empleadoid_devolver_uni').val(data.empleado_id);
+                $('#devolver_correo_uni_alt').val(data.correo_alt);
+                if (data.empleado_id != null){
+                   
+                }else{
+                    $('#devolver_correo_uni').val(msj);
+                }
+                
+                
+            },
+            error: function(xhr, errmsg, err) {
+                console.log("Error: " + errmsg);
+            }
+        });
+        
+    });
+
+    $('#devolver_multi').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id = button.data('id');   
+    
+        $.ajax({
+            url: '/devolver_datos_multi/' + id + '/',   
+            method: 'GET',
+            success: function(data) {
+                $('#devolver_correo_uni').val(data.correo_usuario);
+                $('#empleado_devolver_uni').val(data.empleado);
+                $('#devolver_id_correo_uni').val(data.id_correo_devolver);
+                $('#empleadoid_devolver_uni').val(data.empleado_id);
+                
+            },
+            error: function(xhr, errmsg, err) {
+                console.log("Error: " + errmsg);
+            }
+        });
+        
+    });
+
+
+    $('#asignar_multi').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id = button.data('id');   
+    
+        $.ajax({
+            url: '/obtener_datos_correo_multi/' + id + '/',   
+            method: 'GET',
+            success: function(data) {
+                $('#correo_multi').val(data.correo_encontrado_multi);
+                $('#id_correo_multi').val(data.id_correo_multi);
+            },
+            error: function(xhr, errmsg, err) {
+                console.log("Error: " + errmsg);
+            }
+        });
+        
+    });
+
+  
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkAll = document.getElementById('check-all');
+        const checkItems = document.querySelectorAll('.check-item');
+        checkAll.addEventListener('change', function() {
+            checkItems.forEach(function(item) {
+                item.checked = checkAll.checked;
+            });
+        });
+
+        checkItems.forEach(function(item) {
+            item.addEventListener('change', function() {
+                checkAll.checked = Array.from(checkItems).every(function(checkbox) {
+                    return checkbox.checked;
+                });
+                checkAll.indeterminate = !checkAll.checked && Array.from(checkItems).some(function(checkbox) {
+                    return checkbox.checked;
+                });
+            });
+        });
+    });
+    
+    $(document).ready(function() {
+    $('#enviar-seleccionados').on('click', function() {
+        var seleccionados = [];
+        $('.check-item:checked').each(function() {
+            seleccionados.push($(this).val());  // Guardamos el ID en el array
+        });
+        if (seleccionados.length > 0) {
+            $('#ids_seleccionados').val(seleccionados.join(','));
+        } else {
+            alert('Por favor, selecciona al menos un elemento.');
+        }
+    });
+    $('#datoInforme').on('click', function() {
+        var seleccionados_2 = [];
+ 
+        $('.check-item:checked').each(function() {
+            seleccionados_2.push($(this).val()); 
+        });
+        if (seleccionados_2.length > 0) {
+            $('#ids_seleccionados_info').val(seleccionados_2.join(','));
+        } else {
+            alert('Por favor, selecciona al menos un elemento.');
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (document.getElementById('success-link') && '{{ request.GET.success }}') {
+        document.getElementById('success-link').click();
+    }
+    if (document.getElementById('error-link') && '{{ request.GET.error }}') {
+        document.getElementById('error-link').click();
+    }
+    if (document.getElementById('editar-link') && '{{ request.GET.editar }}') {
+        document.getElementById('editar-link').click();
+    }
+    if (document.getElementById('asignar-link') && '{{ request.GET.asignar }}') {
+        document.getElementById('asignar-link').click();
+    }
+    if (document.getElementById('devolver-link') && '{{ request.GET.devolver }}') {
+        document.getElementById('devolver-link').click();
+    }
+    if (document.getElementById('activar-link') && '{{ request.GET.activar }}') {
+        document.getElementById('activar-link').click();
+    }
+    if (document.getElementById('desactivar-link') && '{{ request.GET.desactivar }}') {
+        document.getElementById('desactivar-link').click();
+    }
+        $('#empleado_asignado').selectize(); 
+        $('#tipo').selectize();  
+        $('#alias_correo').selectize(); 
+        $('#select_empleado_1').selectize(); 
+        $('#select_empleado_2').selectize(); 
+        $('#select_empleado_3').selectize(); 
+        $('#empleado_devolver_multi').selectize();
+    });
+    function generarContrasena() {
+        const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+        const mayusculas = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const minusculas = 'abcdefghijklmnopqrstuvwxyz';
+        const numeros = '0123456789';
+        const simbolos = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+        const palabraClave = ''; 
+        let contrasena = palabraClave; 
+        let tieneMayuscula = false;
+        let tieneNumero = false;
+        let tieneSimbolo = false;
+        while (contrasena.length < 13 + palabraClave.length) {
+            const randomIndex = Math.floor(Math.random() * caracteres.length);
+            const caracter = caracteres[randomIndex];
+            if (mayusculas.includes(caracter) && !tieneMayuscula) {
+                tieneMayuscula = true;
+            }
+            if (numeros.includes(caracter) && !tieneNumero) {
+                tieneNumero = true;
+            }
+            if (simbolos.includes(caracter) && !tieneSimbolo) {
+                tieneSimbolo = true;
+            }
+            contrasena += caracter;
+        }
+        if (!tieneMayuscula) {
+            contrasena = contrasena.slice(0, -1) + mayusculas[Math.floor(Math.random() * mayusculas.length)];
+        }
+        if (!tieneNumero) {
+            contrasena = contrasena.slice(0, -1) + numeros[Math.floor(Math.random() * numeros.length)];
+        }
+        if (!tieneSimbolo) {
+            contrasena = contrasena.slice(0, -1) + simbolos[Math.floor(Math.random() * simbolos.length)];
+        }
+        return contrasena;
+    }
+    $(document).on('click', '#generar', function () {
+        const contrasenaGenerada = generarContrasena();
+        $('#password').val(contrasenaGenerada);
+        $('#password_confirmar').val(contrasenaGenerada);
+    });
+    let intervalo; 
+    $(document).on('click', '#codificar', function () {
+        if (intervalo) {
+            clearInterval(intervalo);  
+        }
+        var dataId = $(this).data('id');
+        $('#data-id-hidden').val(dataId);
+        var boton = $(this);  
+        boton.prop('disabled', true);  
+        $.ajax({
+            url: '{% url "enviar_codigo" %}',  
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                new PNotify({
+                    title: 'Mensaje Enviado',
+                    text: response.message,
+                    type: 'info',
+                    icon: 'fa fa-envelope fa-2x',  
+                    styling: 'bootstrap3'
+                }); 
+             
+                let tiempoRestante = 90;  
+                intervalo = setInterval(function() {
+                    let minutos = Math.floor(tiempoRestante / 60);
+                    let segundos = tiempoRestante % 60;
+                    $('#tiempo-restante').text(`${minutos}:${segundos.toString().padStart(2, '0')}`);
+                    tiempoRestante--;
+                    if (tiempoRestante < 0) {
+                        clearInterval(intervalo);
+                        new PNotify({
+                            title: 'El Codigo Expiro',
+                            text: 'Presiona de nuevo la opcion de llave e ingresa un nuevo codigo para visualizar la CLAVE sin inconvenientes',
+                            type: 'warning',
+                            icon: 'fa fa-clock-o fa-2x',  
+                            styling: 'bootstrap3'
+                        }); 
+                        boton.prop('disabled', false);  
+                    }
+                }, 1000);
+            },
+            error: function(error) {
+                new PNotify({
+                    title: 'ERROR',
+                    text: 'Ocurrio un error intentalo mas tarde!',
+                    type: 'error',
+                    icon: 'fa fa-envelope fa-2x',  
+                    styling: 'bootstrap3'
+                }); 
+                boton.prop('disabled', false);  
+            }
+        });
+    });
+    $(document).on('submit', '#demo-form2', function(e) {
+    e.preventDefault();  
+    $.ajax({
+        url: '{% url "verificar_codigo" %}', 
+        method: 'POST',
+        data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            codigo_ingresado: $('#codigo_ingresado').val(),
+            data: $('#data-id-hidden').val()
+        },
+        success: function(response) {
+            if (response.success) {
+                $('#codigo-verificado').text(response.codigo);  
+                $('#datos').modal('show');  
+                new PNotify({
+                    title: 'Codigo Correcto',
+                    text: 'El codigo de verificacion es correcto la CLAVE esta en la parte superior de la pantalla',
+                    type: 'success',
+                    icon: 'fa fa-ckeck fa-2x',  
+                    styling: 'bootstrap3'
+                }); 
+            } else {
+                
+                new PNotify({
+                    title: 'Codigo Incorrecto',
+                    text: 'El codigo de verificacion que ingresaste es incorrecto vuelve a revisar la bandeja de entrada',
+                    type: 'error',
+                    icon: 'fa fa-key fa-2x',  
+                    styling: 'bootstrap3'
+                }); 
+            }
+        },
+        error: function(error) {
+             
+            new PNotify({
+                    title: 'ERROR',
+                    text: 'Ocurrio un error intentalo mas tarde!',
+                    type: 'error',
+                    icon: 'fa fa-envelope fa-2x',  
+                    styling: 'bootstrap3'
+                }); 
+        }
+    });
+});
+
+
+$('#editModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');   
+   
+    $.ajax({
+        url: '/info_cuenta_editar/' + id_datos + '/',   
+        method: 'GET',
+        success: function(data) {
+
+
+            $('#id_editar').val(data.id_u_correo);
+            $('#correo_editar').val(data.correo_usuario);
+            if(data.compartido == 1){
+                $('#alias_correo_editar').val(1);
+            }else{
+                $('#alias_correo_editar').val(0);
+            }
+           
+            $('#tipo_editar').val(data.tipo)
+            $('#observaciones_editar').val(data.observacion);
+            $('#fecha_asignado_editar').val(data.fecha)
+            
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+</script>
+{% endblock %}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autocomplete with Map</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh7gKB66uvFfsnrQ-R66wFxGVNE2JL6H4&libraries=places"></script>
+
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-4">
+    <h2>Buscar Lugar</h2>
+    <input type="text" id="autocomplete" placeholder="Ingresa una dirección" class="form-control" style="width: 300px;"/>
+
+    <p id="selected-place"></p>
+    <div>
+      <label for="latitude">Latitud:</label>
+      <input type="text" id="latitude" class="form-control" readonly/>
+      <label for="longitude">Longitud:</label>
+      <input type="text" id="longitude" class="form-control" readonly/>
+    </div>
+
+    <!-- Button to trigger modal -->
+    <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#mapModal">Ver Mapa</button>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mapModalLabel">Mapa de Ubicación</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    // Variables globales
+    let map, marker;
+
+    function initAutocomplete() {
+      // Referencia al input
+      const input = document.getElementById("autocomplete");
+
+      // Crear el Autocomplete
+      const autocomplete = new google.maps.places.Autocomplete(input);
+
+      // Limitar a direcciones (opcional)
+      autocomplete.setFields(["address_components", "geometry", "icon", "name"]);
+
+      // Crear el mapa
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: -16.5, lng: -68.15 }, // Coordenadas iniciales (La Paz, Bolivia)
+        zoom: 14,
+      });
+
+      // Escucha la selección de un lugar
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+
+        // Verifica si el lugar tiene coordenadas
+        if (!place.geometry) {
+          alert("No se encontraron coordenadas para este lugar.");
+          return;
+        }
+
+        // Muestra el lugar seleccionado
+        document.getElementById("selected-place").innerText = `Lugar seleccionado: ${place.name}`;
+
+        // Centra el mapa en el lugar seleccionado
+        map.setCenter(place.geometry.location);
+        map.setZoom(15);
+
+        // Agrega un marcador en el lugar seleccionado
+        if (marker) {
+          marker.setMap(null); // Elimina marcador anterior
+        }
+        marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location,
+          draggable: true,  // Hacer que el marcador sea arrastrable
+        });
+
+        // Actualizar latitud y longitud cuando el marcador se mueve
+        google.maps.event.addListener(marker, "dragend", function() {
+          const position = marker.getPosition();
+          updateCoordinates(position);
+        });
+
+        // Actualizar las coordenadas al colocar el marcador
+        updateCoordinates(place.geometry.location);
+      });
+    }
+
+    // Función para actualizar las coordenadas en los inputs
+    function updateCoordinates(location) {
+      document.getElementById("latitude").value = location.lat();
+      document.getElementById("longitude").value = location.lng();
+    }
+
+    // Inicializa el mapa y el autocompletar
+    initAutocomplete();
+  </script>
+</body>
+</html>

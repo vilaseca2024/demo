@@ -1,0 +1,637 @@
+{% extends 'menu.html' %}
+{% block content %}
+<a id="success-link" style="display:none;" onclick="new PNotify({
+    title: 'Mensaje de Éxito',
+    text: 'Documento(s) subidos y guardados correctamente en el DRIVE',
+    type: 'success',
+    icon: 'fa fa-check-circle fa-2x',  
+    styling: 'bootstrap3'
+}); ">Posi</a>
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Documentos del Personal</h3>
+        <br>
+    </div>
+</div>
+<div class="col-md-12 col-sm-12">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listado de Archivos del Personal</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>#</th>
+                                    <th>Empleado</th>
+                                    <th>Codigo</th>
+                                    <th>Documentos</th>
+                                    <th>Estados / Alertas</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in files %}
+                                <tr>
+                                    <td class="text-center">{{ item.documentos.id}}</td>
+                                    <td class="text-center">{{ item.persona.empleado_id.first_name }}<br /> {{ item.persona.empleado_id.last_name }} </td>
+                                    {% if item.persona.ci %}
+                               
+                                        <td class="text-center">{{ item.persona.ci }}{{ item.persona.expedido }}</td>
+                                    {% else %}
+                                    <td class="text-center">--------------</td>
+                                    {% endif %}
+                                        <td>
+                                        {% if item.documentos.foto > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Fotografia
+                                        <br />
+                                        {% if item.documentos.hoja_vida > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Hoja de Vida
+                                        <br />
+                                        {% if item.documentos.croquis > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Croquis Domicilio
+                                        <br />
+                                        {% if item.documentos.luz_agua > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Factura de Luz o Agua
+                                        <br />
+                                        {% if item.documentos.curriculum > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Curriculum
+                                        <br />
+                                        {% if item.documentos.carnet > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Carnet Identidad
+                                        <br />
+                                        {% if item.documentos.felcc > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Certificado FELCC
+                                        <br />
+                                        {% if item.documentos.felcn > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Certificado FELCN
+                                        <br />
+                                        {% if item.documentos.rejab > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Certificado REJAP
+                                        <br />
+                                        {% if item.documentos.certificado_externo > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Certificados de Trabajo
+                                        <br />
+                                        {% if item.documentos.certificado_academico > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Certificados de Academicos
+                                        <br />
+                                        {% if item.documentos.induccion > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Lista de Verificación Inducción
+                                        <br />
+                                        {% if item.documentos.carta_presentacion > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Carta de Presentación
+                                        <br />
+                                        {% if item.documentos.convenios_contratos > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Contratos y convenios
+                                        <br />
+                                        {% if item.documentos.pautas > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Pautas de Actuación Profesional
+                                        <br />
+                                        {% if item.documentos.memorandum > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Memorandums
+                                        <br />
+                                        {% if item.documentos.varios > 0 %}
+                                        <span class="fa fa-check-square-o" style="color: blue;"></span>
+                                        {% else %}
+                                        <span class="fa fa-close" style="color: red;"></span>
+                                        {% endif %} Documentos Varios
+                                        <br />
+                                    </td>
+                                    <td>
+                                        <b>Fotografia: </b>
+                                        {% if item.documentos.foto > 0 %}
+                                            {{ item.documentos.foto }} archivos subidos 
+                                            <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="foto">
+                                                <span class="fa fa-external-link"></span>
+                                            </a>
+                                        {% else %}
+                                            0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Hoja de Vida: </b>
+                                        {% if item.documentos.hoja_vida > 0 %}
+                                            {{ item.documentos.hoja_vida }} archivos subidos 
+                                            <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="hoja_vida">
+                                                <span class="fa fa-external-link"></span>
+                                            </a>
+                                        {% else %}
+                                            0 archivos subidos
+                                        {% endif %}
+                                        <br />
+
+                                        
+                                        <b> Croquis Domicilio: </b>
+                                        {% if item.documentos.croquis > 0 %}
+                                            {{ item.documentos.croquis }} archivos subidos 
+                                            <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="croquis">
+                                                <span class="fa fa-external-link"></span>
+                                            </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Factura de Luz o Agua: </b>
+                                        {% if item.documentos.luz_agua > 0 %}
+                                        {{ item.documentos.luz_agua }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="luz_agua">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Curriculum: </b>
+                                        {% if item.documentos.curriculum > 0 %}
+                                        {{ item.documentos.curriculum }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="curriculum">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Carnet de Identidad: </b>
+                                        {% if item.documentos.carnet > 0 %}
+                                            {{ item.documentos.carnet }} archivos subidos 
+                                            <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="carnet">
+                                                <span class="fa fa-external-link"></span>
+                                            </a>
+                                        {% else %}
+                                            0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Certificado FELCC: </b>
+                                        {% if item.documentos.felcc > 0 %}
+                                            {{ item.documentos.felcc }} archivos subidos 
+                                            <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="felcc">
+                                                <span class="fa fa-external-link"></span>
+                                            </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Certificado FELCN: </b>
+                                        {% if item.documentos.felcn > 0 %}
+                                        {{ item.documentos.felcn }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="felcn">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Certificado REJAP: </b>
+                                        {% if item.documentos.rejab > 0 %}
+                                        {{ item.documentos.rejab }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="rejap">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Certificados de Trabajo Externos: </b>
+                                        {% if item.documentos.certificado_externo > 0 %}
+                                        {{ item.documentos.certificado_externo }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="certificado_trabajo">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Certificados de Trabajo Vilaseca: </b>
+                                        {% if item.documentos.certificado_empresa > 0 %}
+                                        {{ item.documentos.certificado_empresa }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="certificado_trabajo_empresa">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Certificados Academicos: </b>
+                                        {% if item.documentos.certificado_academico > 0 %}
+                                        {{ item.documentos.certificado_academico }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="certificado_academico">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Lista de Verificación Inducción: </b>
+                                        {% if item.documentos.induccion > 0 %}
+                                        {{ item.documentos.induccion }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="induccion">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Carta de Presentación: </b>
+                                        {% if item.documentos.carta_presentacion > 0 %}
+                                        {{ item.documentos.carta_presentacion }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="carta">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Contratos y convenios: </b>
+                                        {% if item.documentos.convenios_contratos > 0 %}
+                                        {{ item.documentos.convenios_contratos }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="convenios">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Pautas de Actuación Profesional: </b>
+                                        {% if item.documentos.pautas > 0 %}
+                                        {{ item.documentos.pautas }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="pautas">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Memorandums: </b>
+                                        {% if item.documentos.memorandum > 0 %}
+                                        {{ item.documentos.memorandum }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="memorandum">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                        <b>Documentos Varios: </b>
+                                        {% if item.documentos.varios > 0 %}
+                                        {{ item.documentos.varios }} archivos subidos 
+                                        <a href="#" class="view-document" data-toggle="modal" data-target="#myModal" data-id="{{ item.documentos.id }}" data-type="varios">
+                                            <span class="fa fa-external-link"></span>
+                                        </a>
+                                        {% else %}
+                                        0 archivos subidos
+                                        {% endif %}
+                                        <br />
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#agregar" 
+                                                data-id="{{ item.documentos.id }}">
+                                            <li class="fa fa-upload"></li> Cargar
+                                        </button>
+
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">Título del Modal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card-box table-responsive">
+                    <table class="table table-striped table-bordered" id="outsideTable" >
+                        <thead>
+                            <tr class="text-center">
+                                <th>Nombre</th>
+                                <th>Siglas</th>
+                                <th>Registro</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="document-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade bs-example-modal" id="agregar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="agregar_documentos_file" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar Archivos</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="hojaDeVida">
+                                    <label class="form-check-label" for="hojaDeVida">Hoja de Vida</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="foto">
+                                    <label class="form-check-label" for="foto">Fotografia</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="croquisDomicilio">
+                                    <label class="form-check-label" for="croquisDomicilio">Croquis Domicilio</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="facturaLuzAgua">
+                                    <label class="form-check-label" for="facturaLuzAgua">Factura de Luz o Agua</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="curriculum">
+                                    <label class="form-check-label" for="curriculum">Curriculum</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="carnetIdentidad">
+                                    <label class="form-check-label" for="carnetIdentidad">Carnet Identidad</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="certificadoFELCC">
+                                    <label class="form-check-label" for="certificadoFELCC">Certificado FELCC</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="certificadoFELCN">
+                                    <label class="form-check-label" for="certificadoFELCN">Certificado FELCN</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="certificadoREJAP">
+                                    <label class="form-check-label" for="certificadoREJAP">Certificado REJAP</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="certificadosTrabajo">
+                                    <label class="form-check-label" for="certificadosTrabajo">Certificados de Trabajo</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="memorandums">
+                                    <label class="form-check-label" for="memorandums">Memorandums</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="documentosVarios">
+                                    <label class="form-check-label" for="documentosVarios">Documentos Varios</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="certificadosAcademicos">
+                                    <label class="form-check-label" for="certificadosAcademicos">Certificados Academicos</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="listaVerificacionInduccion">
+                                    <label class="form-check-label" for="listaVerificacionInduccion">Lista de Verificación Inducción</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="cartaPresentacion">
+                                    <label class="form-check-label" for="cartaPresentacion">Carta de Presentación</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="contratosConvenios">
+                                    <label class="form-check-label" for="contratosConvenios">Contratos y Convenios</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="pautasActuacionProfesional">
+                                    <label class="form-check-label" for="pautasActuacionProfesional">Pautas de Actuación Profesional</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div id="fileInputsContainer">
+                        <input type="hidden" class="form-control" id="documento-id" name="documento-id" >
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (document.getElementById('success-link') && '{{ request.GET.success }}') {
+        document.getElementById('success-link').click();
+    }  
+});
+   $('#agregar').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var documentoId = button.data('id');  
+    var modal = $(this);
+    modal.find('#documento-id').val(documentoId);  
+});
+function toggleFileInput(checkboxId, label) {
+    const fileInputContainer = document.getElementById('fileInputsContainer');
+    const fileInputId = checkboxId + "_file"; 
+    const fileInputName = checkboxId;  
+    
+
+    if (document.getElementById(checkboxId).checked) {
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.id = fileInputId;
+        fileInput.name = fileInputName;  
+        fileInput.classList.add("form-control", "file-input");
+        fileInput.setAttribute("multiple", "multiple"); 
+        const fileDiv = document.createElement("div");
+        fileDiv.classList.add("form-group");
+        const inputLabel = document.createElement("label");
+        inputLabel.setAttribute("for", fileInputId);
+        inputLabel.textContent = label;
+        fileDiv.appendChild(inputLabel);
+        fileDiv.appendChild(fileInput);
+        fileInputContainer.appendChild(fileDiv);
+    } else {
+        const existingFileInput = document.getElementById(fileInputId);
+        if (existingFileInput) {
+            existingFileInput.parentNode.remove();
+        }
+    }
+}
+
+document.querySelectorAll('.form-check-input').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        toggleFileInput(this.id, this.nextElementSibling.textContent);
+    });
+});
+
+$(document).ready(function() {
+    $('#myModal').on('show.bs.modal', function (e) {
+        var button = $(e.relatedTarget);  // El enlace <a> que activó el modal
+        var documentoId = button.data('id');  // Obtiene el ID del data-id
+        var documentoType = button.data('type');  // Obtiene el tipo de documento desde data-type
+        var modalTitle = document.getElementById('myModalLabel');
+    
+   
+        if (documentoType === 'hoja_vida') {
+            modalTitle.textContent = 'Hojas de Vida ';
+        } else if (documentoType === 'croquis') {
+            modalTitle.textContent = 'Croquis de Domicilio';
+        } else if (documentoType === 'foto') {
+            modalTitle.textContent = 'Foto';
+        
+        } else if (documentoType === 'luz_agua') {
+            modalTitle.textContent = 'Facturas de luz y/o Agua';
+        } else if (documentoType === 'curriculum') {
+            modalTitle.textContent = 'Curriculum';
+        } else if (documentoType === 'carnet') {
+            modalTitle.textContent = 'Cedula de Identidad (Carnet)';
+        } else if (documentoType === 'felcc') {
+            modalTitle.textContent = 'FELCC';
+        } else if (documentoType === 'felcn') {
+            modalTitle.textContent = 'FELCN';
+        } else if (documentoType === 'rejap') {
+            modalTitle.textContent = 'REJAP';
+        } else if (documentoType === 'certificado_trabajo') {
+            modalTitle.textContent = 'Certificado de Trabajo Externos';
+        } else if (documentoType === 'certificado_trabajo_empresa') {
+            modalTitle.textContent = 'Certificados de Trabajo Vilaseca';
+        } else if (documentoType === 'certificado_academico') {
+            modalTitle.textContent = 'Certificados Academicos';
+        } else if (documentoType === 'induccion') {
+            modalTitle.textContent = 'Induccion';
+        } else if (documentoType === 'carta') {
+            modalTitle.textContent = 'Carta de Presentacion';
+        } else if (documentoType === 'convenios') {
+            modalTitle.textContent = 'Convenios y Contratos';
+        } else if (documentoType === 'pautas') {
+            modalTitle.textContent = 'Pautas';
+        } else if (documentoType === 'memorandum') {
+            modalTitle.textContent = 'Memorandums';
+        } else if (documentoType === 'varios') {
+            modalTitle.textContent = 'Documentos Varios';
+       
+        } else {
+            modalTitle.textContent = 'Titulo  Modal';
+        }
+        // Realizar la petición AJAX para obtener los registros filtrados por tipo y documento_id
+        $.ajax({
+            url: 'datos_de_vista',  // Reemplaza con la URL de tu vista
+            method: 'GET',
+            data: {
+                'documento_id': documentoId,  // Enviar el ID del documento
+                'documento_type': documentoType  // Enviar el tipo de documento
+            },
+            success: function(response) {
+                // Aquí procesas la respuesta y actualizas la tabla con los documentos
+                var tableBodyHtml = '';  // Empezamos con una cadena vacía para las filas de la tabla
+                if (response.documentos.length > 0) {
+                    response.documentos.forEach(function(doc) {
+                        tableBodyHtml += '<tr>';
+                        tableBodyHtml += '<td>' +  doc.ruta + '</td>';   
+                        tableBodyHtml += '<td>' + doc.siglas + '</td>';   
+                        tableBodyHtml += '<td>' + doc.fecha_registro + '</td>';  
+                        tableBodyHtml += '<td class="text-center">';
+                        
+                        // Botón de descarga
+                        tableBodyHtml += '<a href="' + doc.ruta + '" class="btn btn-primary btn-sm" download><span class="fa fa-download"></span></a> ';
+                        
+                        // Botón de vista previa (abre en nueva pestaña)
+                        tableBodyHtml += '<a href="' + doc.ruta + '" class="btn btn-info btn-sm" target="_blank"><span class="fa fa-eye"></span></a>';
+                        
+                        tableBodyHtml += '</tr>';
+                    });
+
+
+                } else {
+                    tableBodyHtml = '<tr><td colspan="4" class="text-center">No se encontraron documentos.</td></tr>';
+                }
+                $('#outsideTable tbody').html(tableBodyHtml);  
+            },
+            error: function(xhr, status, error) {
+                console.log("Error en la solicitud AJAX: " + error);
+            }
+        });
+    });
+});
+
+
+</script>
+
+{% endblock %}

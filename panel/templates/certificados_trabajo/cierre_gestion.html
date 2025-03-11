@@ -1,0 +1,153 @@
+{% extends 'menu.html' %}
+{% load static %}
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+
+        <h3>Cierre de Gestion</h3>
+        <br>
+    </div>
+
+</div>
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listado de gestiones disponibles</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
+                            class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Gestiones disponibles</th>
+                                    <th>Numero de certificados abiertos</th>
+                                    <th>Numero de certificados cerrados </th>
+                                    <th>Opciones</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if gestiones %}
+                                {% for dato in gestiones %}
+                                <tr>
+                                    <td class="text-center">{{ dato.gestion }}</td>
+                                    <td class="text-center">{{ dato.abiertos }}</td>
+                                    <td class="text-center">{{ dato.cerrados }}</td>
+
+                                    <td class="text-center">
+                                    
+                                        <button class="btn btn-primary btn-sm" data-toggle="modal"
+                                            data-target=".bs-example-modal-sm-show-abrir-{{ dato.gestion }}">
+                                            <li class="fa fa-thumbs-o-up"></li> Abrir Gestion
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" data-toggle="modal"
+                                            data-target=".bs-example-modal-sm-show-cierre-{{ dato.gestion }}">
+                                            <li class="fa fa-thumbs-o-down"></li> Cerrar Gestion
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% if gestiones %}
+    {% for dato in gestiones %}
+<div class="modal fade bs-example-modal-sm-show-abrir-{{dato.gestion}}" tabindex="-1" role="dialog"
+    aria-hidden="true">
+
+    <div class="modal-dialog ">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="abrir_certificados" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="text-center">
+                        <li class="fa fa-thumbs-o-up fa-4x"> </li>
+                    </div>
+                    <input type="hidden" name="gestion" id="gestion" value="{{dato.gestion}}">
+                    <br />
+                    <h5 class="text-center">Estas seguro de abrir la edicion de los certificados de la gestion {{dato.gestion}}?</h5>
+                    <div class="alert alert-primary alert-dismissible text-center" role="alert">
+                        Se habilitaran <strong>{{dato.cerrados}} certificados </strong>para su edicion
+                      </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Aceptar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-sm-show-cierre-{{dato.gestion}}" tabindex="-1" role="dialog"
+    aria-hidden="true">
+
+    <div class="modal-dialog ">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="cerrar_certificados" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="text-center">
+                        <li class="fa fa-thumbs-o-down fa-4x"> </li>
+                    </div>
+                    <input type="hidden" name="gestion" id="gestion" value="{{dato.gestion}}">
+                    <br />
+                    <h5 class="text-center">Estas seguro de cerrar la edicion de los certificados de la gestion {{dato.gestion}}?</h5>
+                    <div class="alert alert-danger alert-dismissible text-center" role="alert">
+                        Se deshabilitaran <strong>{{dato.abiertos}} certificados </strong>para su edicion
+                      </div>
+                
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Aceptar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% endblock %}

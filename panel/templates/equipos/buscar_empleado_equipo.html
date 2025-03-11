@@ -1,0 +1,247 @@
+{% extends 'menu.html' %}
+{% block content %}
+
+
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Buscar Equipos Asigandos a Empleado</h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Buscar historia de equipo</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
+                            class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <form method="POST" action="buscar_empleado_equipo">
+                        {% csrf_token %}
+                        <div class="col-md-12 mb-3  ">
+                            <div class="col-md-4 ">
+                              <label for="empleado_nombre">Nombre de Empleado:</label>
+                              <select id="empleado_nombre" name="empleado_nombre" class="selectize" style="width: 100%;">
+                                <option value="">Selecciona una opción</option>
+                                {% for empleado in empleados %}
+                                    <option value="{{ empleado.id }}">{{ empleado.first_name }} {{ empleado.last_name }}</option>
+                                {% endfor %}
+                              </select>
+                              
+                              
+                            </div>
+                            <div class="col-md-4 ">
+                                <label for="empleado">Codigo Empleado:</label>
+                                <!-- <input class="form-control" type="text" id="codigo_empleado_equipo" name="codigo_empleado_equipo" required/> -->
+                                <select id="codigo_empleado_equipo" name="codigo_empleado_equipo" class="selectize" style="width: 100%;">
+                                    <option value="">Selecciona una opción</option>
+                                    {% for codigo in codigos %}
+                                        <option value="{{ codigo.empleado_id.id}}">{{ codigo.ci }}{{ codigo.expedido }}</option>
+                                    {% endfor %}
+                                  </select>
+                                 
+                                  
+                                  
+                            </div>
+                            <div class="col-md-4 ">
+                                <button type="submit" class="btn btn-primary btn-lg mt-3" >
+                                  <li class="fa fa-search"></li> Buscar Equipos
+                                </button>
+                                <a href="buscar_empleado_equipo">
+                                    <button type="button" class="btn btn-danger btn-lg mt-3"  >
+                                        <li class="fa fa-ban"></li>
+                                      </button>
+                                </a>
+                                
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+  <div class="x_panel">
+      <div class="x_title">
+          <h2>Historial de Equipos del Empleado </h2>
+           
+          <div class="clearfix"></div>
+      </div>
+      <div class="x_content">
+          <div class="row">
+              <div class="col-sm-12">
+                  <div class="card-box table-responsive">
+                      <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                          <thead>
+                              <tr class="text-center">
+                                  <th>Codigo de Equipo</th>
+                                  <th>Detalle</th>
+                                  
+                                  <th>Empleado</th>
+                                  <th>Fecha de Asignacion</th>
+                                  <th>Fecha de Devolucion</th>
+                                  <th>Observaciones de Devolucion</th>
+                                  <th>Estado</th>
+                                  <th>Opciones</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">{{ dato.equipo }}</td>
+                                    <td class="text-center">{% if dato.detalle %}{{ dato.detalle }}{% else %}Sin Detalle {% endif %}</td>
+                                    
+                                    <td class="text-center">{{ dato.empleado.first_name }} {{ dato.empleado.last_name }}</td>
+                                    <td class="text-center">{{ dato.fecha_asignado }}</td>
+                                    <td class="text-center">{% if dato.devolucion %}{{ dato.devolucion.fecha }}{% else %}
+                                        <span class="badge badge-warning" style="font-size: 12px;"><li class="fa fa-exclamation-triangle"></li> En posesion</span>
+                                        {% endif %}</td>
+                                    <td class="text-center">
+                                        {% if dato.devolucion %}
+                                            {% if dato.devolucion.observaciones == '' %}
+                                                Sin Observaciones
+                                            {% else %}
+                                                {{ dato.devolucion.observaciones }}
+                                            {% endif %}
+                                        {% else %}
+                                        <span class="badge badge-warning" style="font-size: 12px;"><li class="fa fa-exclamation-triangle"></li> En posesion</span>
+                                        {% endif %}</td>
+                                    
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="ver_equipo_codigo/{{dato.id_asignacion}}">
+                                            <button class="btn btn-secondary btn-sm">
+                                                <li class="fa fa-eye"></li>  
+                                            </button>
+                                        </a>
+                                        
+                                    
+                                        {% if dato.devolucion %}
+                                        
+                                            
+                                        {% else %}
+                                        <button class="btn btn-primary btn-sm" 
+                                                        data-toggle="modal" 
+                                                        data-target="#devolver"
+                                                        data-id="{{ dato.id_asignacion }}"  > 
+                                                        <a  
+                                            data-toggle="tooltip" 
+                                            data-placement="top" title="" 
+                                            data-original-title="Presiona para registrar la devolucion del equipo">
+                                                    <li class="fa fa-undo"></li>  
+                                                </a>
+                                        </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                              {% else %}
+                              <tr>
+                                <td colspan="17" class="text-center">No hay equipos asignados al empleado {% if no_equipo_message %} {{no_equipo_message}} {% endif %}</td>
+                            </tr>
+                              {% endif %}
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+</div>
+</div>
+<!-- MODAL PARA DEVOLVER UN EQUIPO -->
+<div class="modal fade bs-example-modal-lg-asignar" id="devolver" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="devolver_equipo_buscado" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Devolucion de Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="codigo_equipo_devolver">Equipo </label>
+                            <input type="text" id="codigo_equipo_devolver" name="codigo_equipo_devolver" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="empleado_devolver">Empleado</label>
+                            <input type="hidden" id="empleado_devolver" name="empleado_devolver" class="form-control" readonly>
+                            <input type="text" id="empleado_devolver_nombre" name="empleado_devolver_nombre" class="form-control" readonly>
+                        </div>
+                    
+                        <div class="form-group col-md-12">
+                            <label for="observacion_devolver">Detalle</label>
+                            <textarea name="observacion_devolver" id="observacion_devolver" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    $('#devolver').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_empleo = button.data('id');   
+    
+        $.ajax({
+            url: '/obtener_datos_equipo3/' + id_empleo + '/',   
+            method: 'GET',
+            success: function(data) {
+                $('#codigo_equipo_devolver').val(data.codigo_equipo_devolver);
+                $('#empleado_devolver').val(data.empleado_id);
+                $('#empleado_devolver_nombre').val(data.empleado)
+            },
+            error: function(xhr, errmsg, err) {
+                console.log("Error: " + errmsg);
+            }
+        });
+        
+    });
+    $(document).ready(function() {
+        $('#empleado_nombre').selectize();  // Aplica Selectize al select con id "empleado"
+    });
+ 
+      $(document).ready(function() {
+          $('#codigo_empleado_equipo').selectize();  // Aplica Selectize al select con id "empleado"
+      });
+  </script>
+    {% endblock %}

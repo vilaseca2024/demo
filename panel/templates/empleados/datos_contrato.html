@@ -1,0 +1,566 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+
+
+<a id="success-link" style="display:none;" onclick="new PNotify({
+    title: 'Mensaje de Éxito',
+    text: 'Se registro y guardo los DATOS correctamente.',
+    type: 'success',
+    icon: 'fa fa-check-circle fa-2x',  
+    styling: 'bootstrap3'
+}); ">Posi</a>
+
+<a id="error-link" style="display:none;" onclick="new PNotify({
+    title: 'Oh No!',
+    text: 'Ocurrió un error al guardar los datos.',
+    type: 'error',
+    icon: 'fa fa-exclamation-triangle fa-2x', 
+    styling: 'bootstrap3'
+});">Error</a>
+
+<a id="editar-link" style="display:none;" onclick="new PNotify({
+    title: 'Datos Editados',
+    text: 'Los DATOS EDITADOS se registraron y guardaron correctamente.',
+    icon: 'fa fa-edit fa-2x',  
+    styling: 'bootstrap3',
+});">Editar</a>
+ 
+<a id="activar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Activado',
+    text: 'Se activo el registro correctamente.',
+    type: 'info',
+    styling: 'bootstrap3',
+    icon: 'fa fa-plus-circle fa-2x',  
+    
+});">activar</a>
+
+<a id="desactivar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Desactivado',
+    text: 'Se desactivo el registro correctamente.',
+    type: 'error',
+    icon: 'fa fa-trash-o fa-2x', 
+    styling: 'bootstrap3'
+});">desactivar</a>
+
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Datos de Contrato <button class="btn btn-round btn-info" data-toggle="modal"
+        data-target=".bs-example-modal-lg">
+        <li class="fa fa-plus"></li> Agregar Datos Contrato
+    </button></h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listado de Datos de Contratos</h2>
+            <div class="clearfix"></div>
+        </div>
+        
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>#</th>
+                                    <th>ID trabajador</th>
+                                    <th>Nombre del Trabajador</th>
+                                    <th>Fecha de Registro</th>
+                                    <th>Nro. Trabajo <br/>Nro. WhatsApp </th>
+                                    <th>Inicio de Contrato</th>
+                                    <th>Cargo <br/>Modalidad </th>
+                                    <th>Tipo de Contrato<br/>Tipo de Registro</th>
+                                    <th>Estado</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos_empleado %}
+                                    {% for dato in datos_empleado %}
+                                        <tr>
+                                            <td class="text-center">{{ forloop.counter }}</td>
+                                            <td class="text-center">
+                                                {% if dato.empleado_id.ci %}
+                                                    {{ dato.empleado_id.ci }}{{ dato.empleado_id.expedido }}
+                                                {% else %}
+                                                    <a data-toggle="tooltip" data-placement="top" title="" 
+                                                    data-original-title="Datos aun no cargados por el empleado {{dato.empleado.empleado_id.first_name}} {{dato.empleado.empleado_id.last_name}}">
+                                                        <li class="fa fa-exclamation-triangle fa-2x" style="color: orange;"></li> 
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">{{ dato.empleado_id.empleado_id.first_name }} {{ dato.empleado_id.empleado_id.last_name }}</td>
+                                            <td class="text-center">{{ dato.fecha_registro }}</td>
+                                            <td class="text-center">Cel. {{ dato.numero_trabajo }}<br/>Cel. {{ dato.whatsapp }}</td>
+                                            <td class="text-center">{{ dato.inicio_contrato }}</td>
+                                            <td class="text-center">{{ dato.clasificacion.cargo }}<br/><b>{{ dato.modalidad }}</b></td>
+                                            <td class="text-center"><b>{{ dato.tipo_contrato.contrato }}</b><br/>{{ dato.tipo_registro.registro }}</td>
+                                            <td class="text-center">
+                                                {% if dato.activo %}
+                                                    <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                                {% else %}
+                                                    <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">
+                                                <a 
+                                                data-toggle="tooltip" 
+                                                data-placement="top"  
+                                                data-original-title="Presiona para editar el registro">
+                                                <button class="btn btn-success btn-sm" 
+                                                        data-toggle="modal" 
+                                                        data-target="#editModal"
+                                                        data-id="{{ dato.id_empleo }}"  >
+                                                    <li class="fa fa-edit"></li>  
+                                                </button>
+                                                </a>
+                                              
+                                                {% if dato.activo == 1 %}
+                                                <a 
+                                                data-toggle="tooltip" 
+                                                data-placement="top"  
+                                                data-original-title="Presiona para activar el registro">
+                                                    <button class="btn btn-danger btn-sm"
+                                                    data-toggle="modal" 
+                                                    data-target="#eliminar"
+                                                    data-id="{{ dato.id_empleo }}"  >
+                                                        <li class="fa fa-trash"></li>
+                                                    </button>
+                                                    </a>
+
+                                                {% else %}
+                                                <a 
+                                                data-toggle="tooltip" 
+                                                data-placement="top"  
+                                                data-original-title="Presiona para desactivar el registro">
+                                                    <button class="btn btn-info btn-sm"
+                                                    data-toggle="modal" 
+                                                    data-target="#activar"
+                                                    data-id="{{ dato.id_empleo }}"  >
+                                                        <li class="fa fa-plus-square-o"></li>
+                                                    </button>
+                                                </a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="9" class="text-center">No hay empleados registrados.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="agregar_datos_contrato" method="POST" id="demo-form2">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar datos Contrato</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="codigo">Empleado</label>
+                            <select id="codigo" name="codigo" class="selectize" required>
+                                <option value="">Selecciona un Empleado...</option>
+                                {% for user in usuarios %}
+                                <option value="{{ user.id }}" data-email="{{ user.email }}">
+                                    {{ user.first_name }} {{user.last_name }}</option>
+                                {% endfor %}
+                            </select>
+                             
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="cargoarea">Cargo</label>
+                            <select id="cargoarea" name="cargoarea" class="selectize" required>
+                                <option value="">Selecciona el Cargo de Contratacion...</option>
+                                {% for cargo in cargos %}
+                                    <option value="{{cargo.id_area}}">{{ cargo.cargo }}</option>
+                                {% endfor %}
+                            </select>
+                             
+                        </div>
+                       
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="fecha_registro_crear">Fecha de Registro</label>
+                            <input type="date" id="fecha_registro_crear" name="fecha_registro_crear" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inicio_contrato_crear">Inicio de Contrato</label>
+                            <input type="date" id="inicio_contrato_crear" name="inicio_contrato_crear" class="form-control" required>
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-row">
+                        <!-- <div class="form-group col-md-4">
+                            <label for="correo_corp_crear">Correo Corporativo</label>
+                            <input type="email" id="correo_corp_crear" name="correo_corp_crear" class="form-control" required>
+                        </div> -->
+                        <div class="form-group col-md-5">
+                            <label for="celular_crear">Nro. Celular</label>
+                            <input type="number" id="celular_crear" name="celular_crear" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label for="whatsapp_crear">WhatsApp</label>
+                            <input type="number" id="whatsapp_crear" name="whatsapp_crear" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="interno_crear">Nro. Interno</label>
+                            <input type="number" id="interno_crear" name="interno_crear" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="correo_corp_crear">Tipo de Registro</label>
+                           
+                            <select id="tipo_registro_crear" name="tipo_registro_crear" class="form-control" required="required">
+                                <option value="">----</option>
+                                {% for registro in tipos_registro %}
+                                <option value="{{ registro.id_registro }}">{{ registro.registro }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="tipo_contrato_crear">Tipo de Contrato</label>
+                            <select id="tipo_contrato_crear" name="tipo_contrato_crear" class="form-control" required="required">
+                                <option value="">----</option>
+                                {% for contrato in tipos_contrato %}
+                                <option value="{{ contrato.id_contrato }}">{{ contrato.contrato }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="trabajo_centro">Centro de Trabajo</label>
+                            <!-- <input type="text" id="trabajo_centro" name="trabajo_centro" class="form-control" required> -->
+                            <select id="trabajo_centro" name="trabajo_centro" class="selectize" required="required">
+                                <option value="">----</option>
+                                {% for oficina in oficinas %}
+                                <option value="{{ oficina.id_oficina }}">{{ oficina.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="modalidad_crear">Modalidad</label>
+                            <input type="text" id="modalidad_crear" name="modalidad_crear" class="form-control" required>
+                        </div>
+                        
+                    </div>
+                  
+                     
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<!-- Modal de Edición -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Datos de Empleado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="actualizar_empleo" method="POST" id="editForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <h5>Datos Adicionales (no editables)</h5>
+                    <div class="form-row">
+                         
+                        <div class="form-group col-md-3">
+                            <label for="codigo_trabajador">ID Trabajador</label>
+                            <input type="text" id="codigo_trabajador" name="codigo_trabajador" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="nombre_trab">Nombre del Trabajador</label>
+                            <input type="text" id="nombre_trab" name="nombre_trab" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label for="correo_corp">Correo Corporativo</label>
+                            <input type="email" id="correo_corp" name="correo_corp" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                       
+                        <div class="form-group col-md-4">
+                            <label for="clasificacion_empleado">Clasificacion Empleado</label>
+                            <input type="text" id="clasificacion_empleado" name="clasificacion_empleado" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="recontratacion">Ultima recontratacion</label>
+                            <input type="text" id="recontratacion" name="recontratacion" class="form-control" readonly>
+                        </div>
+                        
+                        <div class="form-group col-md-4">
+                            <label for="antiguedad_anios">Años de Antiguedad</label>
+                            <input type="text" id="antiguedad_anios" name="antiguedad_anios" class="form-control" readonly>
+                        </div>
+                    </div>
+                   
+                    <hr/>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="fecha_registro">Fecha de Registro</label>
+                            <input type="date" id="fecha_registro" name="fecha_registro" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="inicio_contrato">Inicio de Contrato</label>
+                            <input type="date" id="inicio_contrato" name="inicio_contrato" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="modalidad">Modalidad</label>
+                            <input type="text" id="modalidad" name="modalidad" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                     
+                        <div class="form-group col-md-3">
+                            <label for="celular">Nro. Celular</label>
+                            <input type="number" id="celular" name="celular" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="whatsapp">WhatsApp</label>
+                            <input type="number" id="whatsapp" name="whatsapp" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="interno">Nro. Interno</label>
+                            <input type="number" id="interno" name="interno" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="cargo_editar">Cargo</label>
+                            <select id="cargo_editar" name="cargo_editar" class="form-control" required>
+                                
+                                {% for cargo in cargos %}
+                                    <option value="{{cargo.id_area}}">{{ cargo.cargo }}</option>
+                                {% endfor %}
+                            </select>
+                             
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="correo_corp">Tipo de Registro</label>
+                           
+                            <select id="tipo_registro" name="tipo_registro" class="form-control" required="required">
+                                <option value="">----</option>
+                                {% for registro in tipos_registro %}
+                                <option value="{{ registro.id_registro }}">{{ registro.registro }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-4">
+                            <label for="tipo_contrato">Tipo de Contrato</label>
+                            <select id="tipo_contrato" name="tipo_contrato" class="form-control" required="required">
+                                <option value="">----</option>
+                                {% for contrato in tipos_contrato %}
+                                <option value="{{ contrato.id_contrato }}">{{ contrato.contrato }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="trabajo">Centro de Trabajo</label>
+                            <!-- <input type="text" id="trabajo" name="trabajo" class="form-control" required> -->
+                            <select id="trabajo" name="trabajo" class="form-control" required="required">
+                                {% for oficina in oficinas %}
+                                <option value="{{ oficina.id_oficina }}">{{ oficina.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                  
+                   
+                    
+                    <input type="hidden" id="empleado_id" name="empleado_id">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="eliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="eliminar_empleo" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Confirma si deseas desactivar este Registro?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_eliminar" id="id_eliminar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Desactivar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="activar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="activar_empleo" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-plus-square-o"></li>
+                        <h4 class="mt-2">Confirma si deseas Activar este Registro?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_activar" id="id_activar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Activar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    $('#eliminar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_eliminar').val(id_datos);
+    });
+    $('#activar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_activar').val(id_datos);
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        if (document.getElementById('success-link') && '{{ request.GET.success }}') {
+            document.getElementById('success-link').click();
+        }
+        if (document.getElementById('error-link') && '{{ request.GET.error }}') {
+            document.getElementById('error-link').click();
+        }
+        if (document.getElementById('editar-link') && '{{ request.GET.editar }}') {
+            document.getElementById('editar-link').click();
+        }
+        if (document.getElementById('asignar-link') && '{{ request.GET.asignar }}') {
+            document.getElementById('asignar-link').click();
+        }
+        if (document.getElementById('devolver-link') && '{{ request.GET.devolver }}') {
+            document.getElementById('devolver-link').click();
+        }
+        if (document.getElementById('activar-link') && '{{ request.GET.activar }}') {
+            document.getElementById('activar-link').click();
+        }
+        if (document.getElementById('desactivar-link') && '{{ request.GET.desactivar }}') {
+            document.getElementById('desactivar-link').click();
+        }
+        
+        $('#codigo').selectize(); 
+        $('#cargoarea').selectize(); 
+        $('#trabajo_centro').selectize(); 
+        
+        
+        
+    });
+
+  
+    $(document).ready(function() {
+        // Cuando el modal se va a mostrar
+        $('#editModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);  // El botón que abrió el modal
+            var id_empleo = button.data('id');  // Obtener el ID del empleo
+
+            // Realizar una solicitud AJAX para obtener los datos
+            $.ajax({
+                url: '/empleo/' + id_empleo + '/',  // URL de la vista que maneja la obtención de datos
+                method: 'GET',
+                success: function(data) {
+                    // Si los datos se obtienen correctamente, llenamos los campos del modal
+                    $('#codigo_trabajador').val(data.codigo_trabajador);
+                    $('#nombre_trab').val(data.nombre_trab);
+                    $('#fecha_registro').val(data.fecha_registro);
+                    $('#inicio_contrato').val(data.inicio_contrato);
+                    $('#modalidad').val(data.modalidad);
+                    $('#correo_corp').val(data.correo_corp);
+                    $('#cargo_editar').val(data.cargo);
+                    $('#clasificacion').val(data.clasificacion);
+                    $('#tipo_contrato').val(data.tipo_contrato);
+                    $('#tipo_registro').val(data.tipo_registro);
+                    $('#celular').val(data.numero_trabajo);
+                    $('#trabajo').val(data.centro_trabajo);
+                    $('#whatsapp').val(data.whatsapp);
+                    $('#clasificacion_empleado').val(data.clasificacion);
+                    $('#trabajo').val(data.centro_trabajo);
+                    $('#recontratacion').val(data.ultima_recontratacion);
+                    $('#antiguedad_anios').val(data.antiguedad_anios);
+                    // Rellenamos el campo oculto con el ID del empleado
+                    $('#empleado_id').val(data.id);
+                    $('#interno').val(data.interno);
+
+                    // Mostrar el estado en el modal: activo o inactivo
+                    if (data.estado) {
+                        $('#estado_empleado').html('<li class="fa fa-check fa-2x" style="color: blue;"></li>');
+                    } else {
+                        $('#estado_empleado').html('<li class="fa fa-times fa-2x" style="color: red;"></li>');
+                    }
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log("Error: " + errmsg);
+                }
+            });
+        });
+    });
+    
+</script>
+
+{% endblock %}

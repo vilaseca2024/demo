@@ -1,0 +1,518 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+
+
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Cuentas Sistemas Informaticos <button class="btn btn-round btn-success " data-toggle="modal"
+            data-target=".bs-example-modal-lg"><li class="fa fa-plus"></li> Agregar Nueva Cuenta</button></h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Sistemas Informaticos de Oficina</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>#</th>
+                                    <th>Fecha </th>
+                                    <th>Nombre del Sistema</th>
+                                    <th>Usuario</th>
+                                    <th>Tipo Usuario</th>
+                                    <th>Asignado</th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">{{ dato.id_cuenta }}</td>
+                                    <td class="text-center">{{ dato.fecha }}</td>
+                                    <td class="text-center">{{ dato.sistema.nombre }}</td>
+                                    <td class="text-center">{{ dato.usuario }} </td>
+                                    <td class="text-center">{{ dato.tipo_usuario }}</td>
+                                    <td class="text-center">
+                                        {% if dato.estado == True %}
+                                            {{ dato.asignado.empleado.first_name }} {{ dato.asignado.empleado.last_name }}
+                                        {% else %}
+                                        <a href="#"  
+                                        data-toggle="modal"
+                                        data-target="#asignar"
+                                        data-sis="{{ dato.sistema.nombre }}" 
+                                        data-usu="{{ dato.usuario }}" 
+                                        data-id="{{ dato.id_cuenta }}" > 
+                                        <span class="badge badge-secondary" style="font-size: 12px;"><li class="fa fa-cogs"></li><br/> Asignar Nuevo</span> </a>
+                                        {% endif %}
+                                    </td>
+                                     
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                      
+                                      
+                                        <button class="btn btn-success btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#editModal"
+                                                data-id="{{ dato.id_cuenta }}"  >
+                                            <li class="fa fa-edit"></li>  
+                                        </button>
+                                  
+
+                                       
+                                     
+                                        {% if dato.estado == True %}
+                                        
+                                            <button class="btn btn-primary btn-sm" 
+                                                    data-toggle="modal" 
+                                                    data-target="#devolver"
+                                                    data-id="{{ dato.id_cuenta }}"  > 
+                                                    <a  
+                                                        data-toggle="tooltip" 
+                                                        data-placement="top" title="" 
+                                                        data-original-title="Presiona para registrar la baja de la cuenta">
+                                                        <li class="fa fa-undo"></li>  
+                                                    </a>
+                                            </button>
+                                        
+                                       
+                                        {% endif %}
+
+
+                                        {% if dato.activo == 1 %}
+                                            <button class="btn btn-danger btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#eliminar"
+                                            data-id="{{ dato.id_cuenta }}"  >
+                                                <li class="fa fa-trash"></li>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-info btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#activar"
+                                            data-id="{{ dato.id_cuenta }}"  >
+                                                <li class="fa fa-plus-square-o"></li>
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL PARA AGREGAR  -->
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="agregar_cuenta_software" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar nueva Cuenta de Sistemas</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="nombre_sistema">Nombre del Sistema Informatico</label>
+                             
+                            <select id="nombre_sistema" name="nombre_sistema" class="selectize" required>
+                                <option value="">Selecciona un sistema...</option>
+                                {% for sis in sistemas %}
+                                <option value="{{sis.id_sistema}} ">{{sis.nombre}} </option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            <label for="fecha">Fecha</label>
+                            <input type="date" id="fecha" name="fecha" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="usuario_cuenta">Usuario</label>
+                            <input type="text" id="usuario_cuenta" name="usuario_cuenta" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="tipo_cuenta">Tipo de Cuenta</label>
+                            <select class="selectize" id="tipo_cuenta" name="tipo_cuenta" required>
+                                <option value="">Selecciona una opcion...</option>
+                                <option value="INTERNO">INTERNO</option>
+                                <option value="EXTERNO">EXTERNO</option>
+                                <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                
+                            </select>
+                        </div>
+                      
+                        <div class="form-group col-md-12">
+                            <label for="empleado">Empleado Asignado</label>
+                            <select id="empleado" name="empleado" class="selectize" required>
+                                <option value="">Selecciona un empleado...</option>
+                                {% for user in usuarios %}
+                                <option value="{{user.id}} ">{{user.first_name}} {{user.last_name}}</option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea name="observaciones" id="observaciones" class="form-control"></textarea>
+                        </div>
+                    </div>
+
+                     
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- MODAL PARA ASIGNAR EQUIPO A EMPLEADO -->
+<div class="modal fade bs-example-modal-lg-asignar" id="asignar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="asignar_cuenta_sistemas" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Asignar Cuenta a Empleado</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="sistema_asig">Nombre del Sistema </label>
+                            <input type="text" id="sistema_asig" name="sistema_asig" class="form-control" readonly>
+                            <input type="hidden" id="id_asignar" name="id_asignar" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="usuario_asig">Usuario </label>
+                            <input type="text" id="usuario_asig" name="usuario_asig" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="fecha_asig">Fecha Asignado (^)</label>
+                            <input type="date" id="fecha_asig" name="fecha_asig" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="empleado_asig">Empleado para Asignar (*)</label>
+                           
+                            <select id="empleado_asig" name="empleado_asig" class="selectize" required>
+                                <option value="">Selecciona un empleado...</option>
+                                {% for user in usuarios %}
+                                <option value="{{user.id}} ">{{user.first_name}} {{user.last_name}}</option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+                    
+                        <div class="form-group col-md-12">
+                            <label for="observacion_asig">Observacion</label>
+                            <textarea name="observacion_asig" id="observacion_asig" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- MODAL PARA DEVOLVER UN EQUIPO -->
+<div class="modal fade bs-example-modal-lg-asignar" id="devolver" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="devolver_cuenta_sistemas" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Registrar la Baja del asignado a la Cuenta</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="sistema_devolver">Nombre del Sistema </label>
+                            <input type="text" id="sistema_devolver" name="sistema_devolver" class="form-control" readonly>
+                            
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="usuario_devolver">Usuario Creado</label>
+                            <input type="text" id="usuario_devolver" name="usuario_devolver" class="form-control" readonly>
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="empleado_devolver">Empleado Asignado</label>
+                            <input type="hidden" id="id_devolver" name="id_devolver" class="form-control" readonly>
+                            <input type="text" id="empleado_devolver_nombre" name="empleado_devolver_nombre" class="form-control" readonly>
+                        </div>
+                    
+                        <div class="form-group col-md-12">
+                            <label for="observacion_devolver">Observacion</label>
+                            <textarea name="observacion_devolver" id="observacion_devolver" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+<!-- MODAL PARA EDITAR REGISTRO -->
+<div class="modal fade bs-example-modal-lg" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="editar_cuenta_software" method="POST" id="demo-form2"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Editar Cuenta de Sistemas Informatico</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="nombre_editar">Nombre del Sistema Informatico</label>
+                            <input class="form-control" id="id_editar" name="id_editar" type="hidden"/>
+                            <select id="nombre_editar" name="nombre_editar" class="form-control" required>
+                                <option value="">Selecciona un sistema...</option>
+                                {% for sis in sistemas %}
+                                <option value="{{sis.id_sistema}}">{{sis.nombre}}</option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6 ">
+                            <label for="fecha_editar">Fecha</label>
+                            <input type="date" id="fecha_editar" name="fecha_editar" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="usuario_cuenta_editar">Usuario</label>
+                            <input type="text" id="usuario_cuenta_editar" name="usuario_cuenta_editar" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="tipo_cuenta_editar">Tipo de Cuenta</label>
+                            <select class="form-control" id="tipo_cuenta_editar" name="tipo_cuenta_editar" required>
+                                <option value="">Selecciona una opcion...</option>
+                                <option value="INTERNO">INTERNO</option>
+                                <option value="EXTERNO">EXTERNO</option>
+                                <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                
+                            </select>
+                        </div>
+                      
+                        <!-- <div class="form-group col-md-12">
+                            <label for="empleado_editar">Empleado Asignado</label>
+                            <select id="empleado_editar" name="empleado_editar" class="form-control" required>
+                                <option value="">Selecciona un empleado...</option>
+                                {% for user in usuarios %}
+                                <option value="{{user.id}}">{{user.first_name}} {{user.last_name}}</option>
+                                {% endfor %}
+
+                            </select>
+                        </div> -->
+                        <div class="form-group col-md-12">
+                            <label for="observaciones_editar">Observaciones</label>
+                            <textarea name="observaciones_editar" id="observaciones_editar" class="form-control"></textarea>
+                        </div>
+                    </div>
+
+                     
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="eliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="eliminar_cuentas_software" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Confirma si deseas desactivar este Software?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_eliminar" id="id_eliminar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Desactivar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="activar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="activar_cuentas_software" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-plus-square-o"></li>
+                        <h4 class="mt-2">Confirma si deseas Activar este Software?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_activar" id="id_activar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Activar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#empleado_asignado').selectize(); 
+    $('#empleado').selectize(); 
+    $('#tipo_cuenta').selectize();
+    $('#nombre_sistema').selectize();
+    $('#empleado_asig').selectize();
+});
+
+$('#eliminar').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');    
+    $('#id_eliminar').val(id_datos);
+});
+$('#activar').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');    
+    $('#id_activar').val(id_datos);
+});
+
+$('#asignar').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var sistema = button.data('sis');   
+    var usuario = button.data('usu');
+    var id = button.data('id');
+    $('#id_asignar').val(id);
+    $('#usuario_asig').val(usuario);  
+    $('#sistema_asig').val(sistema);    
+});
+
+$('#devolver').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');  
+   
+    $.ajax({
+        url: '/info_cuenta_software_devolver/' + id_datos + '/',   
+        method: 'GET',
+        success: function(data) {
+            
+            $('#usuario_devolver').val(data.usuario_devolver);
+            $('#id_devolver').val(data.id_cuenta);
+           
+            $('#sistema_devolver').val(data.sistema_devolver);
+            $('#empleado_devolver_nombre').val(data.asignado_devolver_nombre);
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+    
+});
+
+
+$('#editModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id');   
+    $.ajax({
+        url: '/info_cuenta_software_editar/' + id_datos + '/',   
+        method: 'GET',
+        success: function(data) {
+
+            $('#id_editar').val(data.id_cuenta);
+            $('#fecha_editar').val(data.fecha);
+            $('#usuario_cuenta_editar').val(data.usuario);
+            $('#tipo_cuenta_editar').val(data.tipo_usuario);
+            $('#observaciones_editar').val(data.observaciones);
+            $('#nombre_editar').val(data.sistema);
+         
+        },
+        error: function(xhr, errmsg, err) {
+            console.log("Error: " + errmsg);
+        }
+    });
+});      
+</script>
+{% endblock %}

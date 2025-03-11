@@ -1,0 +1,27 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Registrar equipo</h3>
+        <br>
+    </div>
+</div>
+<div>
+    <h1>Generar  QR</h1>
+    <form method="post" action="qr">
+        {% csrf_token %}
+        <label for="qr_data">Texto para el QR:</label>
+        <input type="text" id="qr_data" name="qr_data" required>
+        <button type="submit">Generar QR</button>
+    </form>
+
+    {% if qr_code_url %}
+        <h2>Tu código QR:</h2>
+        <img src="{{ qr_code_url }}" alt="Código QR">
+    {% endif %}
+
+</div>
+   
+
+{% endblock %}

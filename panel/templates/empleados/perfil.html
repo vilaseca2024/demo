@@ -1,0 +1,280 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Perfil de Usuario</h3>
+        <br>
+    </div>
+</div>
+
+
+<div class="clearfix"></div>
+
+<div class="row">
+    <div class="col-md-12 col-sm-12 ">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Datos<small>(reporte)</small></h2>
+          <ul class="nav navbar-right panel_toolbox">
+            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <a class="dropdown-item" href="#">Settings 1</a>
+                  <a class="dropdown-item" href="#">Settings 2</a>
+                </div>
+            </li>
+            <li><a class="close-link"><i class="fa fa-close"></i></a>
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <div class="col-md-3 col-sm-3  profile_left">
+            <div class="profile_img">
+              <div id="crop-avatar">
+                <!-- Current avatar -->
+                
+                    {% if foto.drive %}
+                  
+                    <img class="img-responsive avatar-view" src="{{foto_persona}}" alt="Avatar" title="Change the avatar" style="height: auto; width: 250px;">
+                    {% else %}
+                    <img class="img-responsive avatar-view" src="media/usuario.png" alt="Avatar" title="Change the avatar" style="height: auto; width: 250px;">
+                    
+                    {% endif %}
+              </div>
+            </div>
+            <h3>{{datos.nombre}} {{datos.ap_paterno}} {{datos.ap_materno}}</h3>
+
+            <ul class="list-unstyled user_data">
+              <li><i class="fa fa-map-marker user-profile-icon"></i> {{contacto.direccion}}
+              </li>
+
+              <li>
+                <i class="fa fa-phone"></i> {{contacto.celular}}
+              </li>
+
+              <li class="m-top-xs">
+                <i class="fa fa-envelope-o"></i> {{user.email}}
+               
+              </li>
+            </ul>
+
+            <a href="#"><button class="btn btn-info"><i class="fa fa-edit "></i> Editar Datos</button></a>
+            <br />
+
+             
+          </div>
+          
+          <div class="col-md-8 col-sm-8 ">
+
+            <h3> Resumen del registro</h3>
+            <div class="perfil-container">
+              <div class="perfil-grid">
+                   
+                  <div class="row">
+                      <div class="col-3 col-label">CI:</div>
+                      <div class="col-9">{{ datos.ci }} {{ datos.expedido }}</div>
+                  </div>
+                  <div class="row">
+                      <div class="col-3 col-label">Fecha de Nacimiento:</div>
+                      <div class="col-9">{{ datos.fecha_nacimiento|date:"d/m/Y" }}</div>
+                  </div>
+                  
+                  <div class="row">
+                      <div class="col-3 col-label">Estado Civil:</div>
+                      <div class="col-9">{{ datos.estado_civil.estado }}</div>
+                  </div>
+                  <div class="row">
+                      <div class="col-3 col-label">Género:</div>
+                      <div class="col-9">{{ datos.genero.genero }}</div>
+                  </div>
+                  <div class="row">
+                      <div class="col-3 col-label">Tipo de Sangre:</div>
+                      <div class="col-9">{{ datos.tipo_sangre }}</div>
+                  </div>
+      
+                  <!-- Segunda fila: Contactos personales (2 columnas) -->
+                  <div class="row">
+                      <div class="col-3 col-label">Celular:</div>
+                      <div class="col-9">{{ contacto.celular }}</div>
+                  </div>
+                   
+                  <div class="row">
+                      <div class="col-3 col-label">Departamento:</div>
+                      <div class="col-9">{{ contacto.departamento.departamento }}</div>
+                  </div>
+                  <div class="row">
+                      <div class="col-3 col-label">Ciudad:</div>
+                      <div class="col-9">{{ contacto.ciudad.ciudad }}</div>
+                  </div>
+                  <div class="row">
+                      <div class="col-3 col-label">Dirección:</div>
+                      <div class="col-9">{{ contacto.direccion }}</div>
+                  </div>
+                  <div class="row">
+                      <div class="col-3 col-label">Hijos:</div>
+                      <div class="col-9">{{ contacto.hijos|yesno:"Sí,No" }}</div>
+                  </div>
+      
+                  <!-- Tercera fila: Contactos de emergencia (2 columnas) -->
+                  <div class="row">
+                      <div class="col-3 col-label">Contacto 1:</div>
+                      <div class="col-9">{{ contacto.contacto1_nombre }} ({{ contacto.contacto1_parentesco }}): {{ contacto.contacto1_numero }}</div>
+                  </div>
+                  <div class="row">
+                      <div class="col-3 col-label">Contacto 2:</div>
+                      <div class="col-9">{{ contacto.contacto2_nombre }} ({{ contacto.contacto2_parentesco }}): {{ contacto.contacto2_numero }}</div>
+                  </div>
+      
+                   
+              </div>
+          </div>
+           
+            <br/>
+            <div class="" role="tabpanel" data-example-id="togglable-tabs">
+              <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                  <li role="presentation" class="active"><a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Progreso del registro de datos</a>
+                  </li>
+                  <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Acividades Recientes</a>
+                  </li>
+                  <li role="presentation" class=""><a href="#tab_content3" role="tab" id="profile-tab2" data-toggle="tab" aria-expanded="false">Alertas y Notificaciones</a>
+                  </li>
+                 
+              </ul>
+               
+             
+              <div id="myTabContent" class="tab-content">
+                <div role="tabpanel" class="tab-pane active " id="tab_content1" aria-labelledby="home-tab">
+
+                  <!-- start recent activity -->
+                  <table class="data table table-striped no-margin">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Detalle del Registro</th>
+                            <th>Estado</th>
+                            <th class="hidden-phone">Porcentaje</th>
+                            <th>Progreso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Fila de Datos Personales -->
+                        <tr>
+                            <td>1</td>
+                            <td>Datos Personales</td>
+                            <td>
+                                {% if datos_personales_incompletos > 0 %}
+                                    Incompletos
+                                {% else %}
+                                    Completos
+                                {% endif %}
+                            </td>
+                            <td class="hidden-phone">{{ datos_personales_porcentaje|floatformat:2 }} %</td>
+                            <td class="vertical-align-mid">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped bg-info" data-transitiongoal="{{ datos_personales_porcentaje }}"></div>
+                                </div>
+                            </td>
+                        </tr>
+        
+                        <!-- Fila de Contacto -->
+                        <tr>
+                            <td>2</td>
+                            <td>Informacion de Contacto</td>
+                            <td>
+                                {% if contacto_incompletos > 0 %}
+                                    Incompletos
+                                {% else %}
+                                    Completos
+                                {% endif %}
+                            </td>
+                            <td class="hidden-phone">{{ contacto_porcentaje|floatformat:2 }} %</td>
+                            <td class="vertical-align-mid">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped bg-primary" data-transitiongoal="{{ contacto_porcentaje }}"></div>
+                                </div>
+                            </td>
+                        </tr>
+        
+                        <!-- Fila de Archivos -->
+                        <tr>
+                            <td>3</td>
+                            <td>Archivos (File)</td>
+                            <td>
+                                {% if file_incompletos > 0 %}
+                                    Incompletos
+                                {% else %}
+                                    Completos
+                                {% endif %}
+                            </td>
+                            <td class="hidden-phone">{{ file_porcentaje|floatformat:2 }} %</td>
+                            <td class="vertical-align-mid">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped bg-success" data-transitiongoal="{{ file_porcentaje }}"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                  <!-- end recent activity -->
+
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
+
+                  <!-- start user projects -->
+                 
+                  <!-- end user projects -->
+                  <ul class="messages">
+                    <li>
+                      <img src="images/img.jpg" class="avatar" alt="Avatar">
+                      <div class="message_date">
+                        <h3 class="date text-info">24</h3>
+                        <p class="month">May</p>
+                      </div>
+                      <div class="message_wrapper">
+                        <h4 class="heading">Desmond Davison</h4>
+                        <blockquote class="message">Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua butcher retro keffiyeh dreamcatcher synth.</blockquote>
+                        <br />
+                        <p class="url">
+                          <span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
+                          <a href="#"><i class="fa fa-paperclip"></i> User Acceptance Test.doc </a>
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <img src="images/img.jpg" class="avatar" alt="Avatar">
+                      <div class="message_date">
+                        <h3 class="date text-error">21</h3>
+                        <p class="month">May</p>
+                      </div>
+                      <div class="message_wrapper">
+                        <h4 class="heading">Brian Michaels</h4>
+                        <blockquote class="message">Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua butcher retro keffiyeh dreamcatcher synth.</blockquote>
+                        <br />
+                        <p class="url">
+                          <span class="fs1" aria-hidden="true" data-icon=""></span>
+                          <a href="#" data-original-title="">Download</a>
+                        </p>
+                      </div>
+                    </li>
+                     
+
+                  </ul>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
+                  <p>Seccion de Alertas (Construccion)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}

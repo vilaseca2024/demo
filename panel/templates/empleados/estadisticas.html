@@ -1,0 +1,153 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Estadísticas del Personal</h3>
+        <br>
+    </div>
+</div>
+<div class="col-md-6 col-sm-6">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Gráfico de Barras <small>Generaciones</small></h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <canvas id="myGeneracionBarChart" height="200px"></canvas>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-sm-6">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Gráfico de Barras <small>Clasificación de Grupo</small></h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <canvas id="myClasificacionGrupoBarChart" height="200px"></canvas>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-sm-6">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Gráfico Circular <small>Géneros</small></h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <canvas id="myGeneroPieChart" height="200px"></canvas>
+        </div>
+    </div>
+    <input type="hidden" id="generacion_labels" value="{{ generacion_labels|join:', ' }}">
+    <input type="hidden" id="generacion_counts" value="{{ generacion_counts|join:', ' }}">
+    <input type="hidden" id="clasificacion_grupo_labels" value="{{ clasificacion_grupo_labels|join:', ' }}">
+    <input type="hidden" id="clasificacion_grupo_counts" value="{{ clasificacion_grupo_counts|join:', ' }}">
+    <input type="hidden" id="genero_labels" value="{{ genero_labels|join:', ' }}">
+    <input type="hidden" id="genero_counts" value="{{ genero_counts|join:', ' }}">
+</div>
+<div class="clearfix"></div>
+
+
+
+<script>
+    // Función para configurar los gráficos de barras
+    function crearGraficoBarra(ctx, labels, data, backgroundColor, borderColor) {
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Número de empleados',
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        min: 0
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true, // Mantener la leyenda siempre visible
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    }
+
+    // Función para configurar el gráfico circular (pie chart)
+    function crearGraficoCircular(ctx, labels, data, backgroundColor, borderColor) {
+        return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Número de empleados',
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true, // Mantener la leyenda siempre visible
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + ' empleados';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Datos Generación
+    var generacionLabels = document.getElementById('generacion_labels').value.split(', ');
+    var generacionCounts = document.getElementById('generacion_counts').value.split(', ').map(Number);
+    var ctxGeneracion = document.getElementById('myGeneracionBarChart').getContext('2d');
+    crearGraficoBarra(ctxGeneracion, generacionLabels, generacionCounts, 'rgba(54, 162, 235, 0.2)', 'rgba(54, 162, 235, 1)');
+
+    // Datos Clasificación Grupo
+    var clasificacionGrupoLabels = document.getElementById('clasificacion_grupo_labels').value.split(', ');
+    var clasificacionGrupoCounts = document.getElementById('clasificacion_grupo_counts').value.split(', ').map(Number);
+    var ctxClasificacionGrupo = document.getElementById('myClasificacionGrupoBarChart').getContext('2d');
+    crearGraficoBarra(ctxClasificacionGrupo, clasificacionGrupoLabels, clasificacionGrupoCounts, 'rgba(255, 159, 64, 0.2)', 'rgba(255, 159, 64, 1)');
+
+    // Datos Género
+    var generoLabels = document.getElementById('genero_labels').value.split(', ');
+    var generoCounts = document.getElementById('genero_counts').value.split(', ').map(Number);
+    var ctxGeneroPie = document.getElementById('myGeneroPieChart').getContext('2d');
+    crearGraficoCircular(ctxGeneroPie, generoLabels, generoCounts, 
+                         ['rgba(128, 128, 0, 0.5)', 'rgba(255, 0, 132,0.5)', 'rgba(0, 192, 192, 0.5)'],
+                         ['rgba(54, 162, 0, 1)', 'rgba(255, 0, 132, 1)', 'rgba(0, 192, 192, 1)']);
+</script>
+
+
+
+{% endblock %}

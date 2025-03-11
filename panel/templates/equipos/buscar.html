@@ -1,0 +1,402 @@
+{% extends 'menu.html' %}
+{% block content %}
+
+<style>
+  .prod_color {
+  list-style: none; /* Elimina los puntos de la lista */
+  padding: 0;
+  margin: 0;
+}
+.auxiliar-item {
+  display: block; /* Cada item ocupa toda la línea */
+  margin-bottom: 15px; /* Espacio entre cada opción */
+  text-align: center; /* Alineamos el texto al centro */
+}
+.color-circle {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;  /* Tamaño del círculo */
+  height: 40px; /* Tamaño del círculo */
+  border-radius: 50%; /* Hacer el círculo */
+  margin-right: 10px; /* Espacio entre el círculo y el texto */
+}
+.color {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+}
+.color i {
+  color: white; /* Color del ícono */
+  font-size: 20px; /* Tamaño del ícono */
+}
+.bg-blue {
+  background-color: #007bff;
+}
+.bg-orange {
+  background-color: #f39c12;
+}
+
+.bg-red {
+  background-color: #e74c3c;
+}
+
+.bg-green {
+  background-color: #2ecc71;
+}
+
+.bg-gray {
+  background-color: #bdc3c7;
+}
+
+.prod_color p {
+  margin: 0;
+  font-size: 16px; /* Tamaño de la fuente */
+}
+
+</style>
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Buscar Equipo </h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Buscar informacion de equipo</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
+                            class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <form method="POST" action="mostrar_equipo">
+                        {% csrf_token %}
+                        <div class="col-md-12 mb-3 d-flex justify-content-end  ">
+                            <div class="col-md-4 ">
+                                <label for="codigo">Codigo de Equipo:</label>
+                                <input class="form-control" type="text" id="codigo" name="codigo" required/>
+                            </div>
+                            <div class="col-md-5 ">
+                                <button type="submit" class="btn btn-primary btn-lg mt-3" >
+                                  <li class="fa fa-search"></li> Buscar Detalle
+                                </button>
+                                <button type="button" class="btn btn-danger btn-lg mt-3"  >
+                                  <li class="fa fa-ban"></li>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if datos.nombre %}
+    <div class="row" id="resultado"  >
+      <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Equipo: {{datos.nombre}} / {{datos.codigo_equipo}}</h2>
+            <ul class="nav navbar-right panel_toolbox">
+              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#">Settings 1</a>
+                    <a class="dropdown-item" href="#">Settings 2</a>
+                  </div>
+              </li>
+              <li><a class="close-link"><i class="fa fa-close"></i></a>
+              </li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div class="col-md-7 col-sm-7 ">
+              <div class="product-image d-flex align-items-center justify-content-center" style="height: 550px; display: inline-block; overflow: hidden;">
+                <img id="main-image" src="/media/{{datos.imagen_0}}" alt="..." style="width: 100%; height: 100%; object-fit: contain; object-position: center;">
+            </div>
+              <div class="product_gallery">
+                {% if datos.imagen_1 %}
+                <a class="gallery-item" style="width: 100px; height: 100px; display: inline-block; overflow: hidden;">
+                  <img src="/media/{{datos.imagen_1}}" alt="..." style="width: 100%; height: 100%; object-fit: cover;" />
+                </a>
+                {% endif %}
+                {% if datos.imagen_2 %}
+                <a class="gallery-item" style="width: 100px; height: 100px; display: inline-block; overflow: hidden;">
+                  <img src="/media/{{datos.imagen_2}}" alt="..." style="width: 100%; height: 100%; object-fit: cover;" />
+                </a>
+                {% endif %}
+                {% if datos.imagen_3 %}
+                <a class="gallery-item" style="width: 100px; height: 100px; display: inline-block; overflow: hidden;">
+                  <img src="/media/{{datos.imagen_3}}" alt="..." style="width: 100%; height: 100%; object-fit: cover;" />
+                </a>
+                {% endif %}
+                {% if datos.imagen_4 %}
+                <a class="gallery-item" style="width: 100px; height: 100px; display: inline-block; overflow: hidden;">
+                  <img src="/media/{{datos.imagen_4}}" alt="..." style="width: 100%; height: 100%; object-fit: cover;" />
+                </a>
+                {% endif %}
+  
+              </div>
+              
+            </div>
+  
+            <div class="col-md-5 col-sm-5 " style="border:0px solid #e5e5e5;">
+              <h3 class="prod_title">{{datos.nombre}} <br/><small> {{datos.modelo}} / {{datos.marca}}</small></h3>
+              <p class="text-justify">{{datos.descripcion}} </p>
+              <br />
+  
+              <div class="">
+                <h2>Equipos auxiliares</h2>
+                <ul class="prod_color display-layout">
+                  {% for auxiliar in equipos_auxiliares %}
+                    <li class="auxiliar-item">
+                      <div class="color-circle">
+                        {% if auxiliar == "Mouse" %}
+                          <div class="color bg-blue">
+                            <i class="fa fa-mouse"></i> 
+                          </div>
+                        {% elif auxiliar == "Teclado" %}
+                          <div class="color bg-orange">
+                            <i class="fa fa-keyboard"></i> 
+                          </div>
+                        {% elif auxiliar == "Cargador" %}
+                          <div class="color bg-red">
+                            <i class="fa fa-plug"></i> 
+                          </div>
+                        {% elif auxiliar == "Cooler Externo" %}
+                          <div class="color bg-green">
+                            <i class="fa fa-fan"></i> 
+                          </div>
+                        {% else %}
+                          <div class="color bg-gray">
+                            <i class="fa fa-cogs"></i> 
+                          </div>
+                        {% endif %}
+                      </div>
+                      <p>{{ auxiliar }}</p>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+              <br />
+              <div class="">
+                <h2>Detalles <small>Clasificacion</small></h2>
+                <ul class="list-inline prod_size display-layout">
+                  <li>
+                    <button type="button" class="btn btn-default btn-xs">{{datos.tipo}}</button>
+                  </li>
+                  <li>
+                    <button type="button" class="btn btn-default btn-xs">{{datos.tamano}}</button>
+                  </li>
+                  <li>
+                    <button type="button" class="btn btn-default btn-xs">{%if datos.antiguo %}Antiguo{%else%}Nuevo{%endif%}</button>
+                  </li>
+                </ul>
+              </div>
+              <div class="">
+                <div class="product_price">
+                  <img src="../../../{{datos.qr}}" alt="qr" style="height: 150px;"><br/>
+                  <br/><span class="price-tax">
+                      Asignado: {% if datos.asignado %}{{datos.asignado}}{% else %}Sin Asignar{% endif %}<br/>
+                      <small>
+                          Area: Sistemas
+                      </small>
+                  </span>
+                  <br>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <ul class="nav nav-tabs bar_tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Registro de Asignacion</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Devoluciones y observaciones</a>
+                </li>
+               
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                  <table class="data table table-striped no-margin">
+                      <thead>
+                          <tr class="text-center">
+                              <th>Fecha Asignado</th>
+                              <th>Fecha Devuelto</th>
+                              <th>Empleado Asignado</th>
+                              <th>Detalles</th>
+                              <th>Estado</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% if asignados %}
+                              {% for asig in asignados %}
+                                  <tr>
+                                      <td class="text-center">{{ asig.fecha_asignado }}</td>
+                                      <td class="text-center">{{ asig.fecha_devuelto }}</td>
+                                      <td class="text-center">{{ asig.empleado.first_name }} {{ asig.empleado.last_name }}  </td>
+                                      <td class="text-center">{% if asig.detalle %}{{ asig.detalle }}{% else %}Sin Detalles{% endif %}</td>
+                                      <td class="text-center">
+                                        {% if asig.estado == True %}
+                                        <span class="badge badge-secondary">
+                                            Devuelto
+                                        </span>
+                                        {% else %}
+                                        <span class="badge badge-warning">
+                                          En posesion<br/>del equipo
+                                        </span>
+                                        {% endif %}
+                                      </td>
+                                  </tr>
+                              {% endfor %}
+                          {% else %}
+                              <tr>
+                                  <td colspan="17" class="text-center">No hay registrados.</td>
+                              </tr>
+                          {% endif %}
+                      </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                  <table class="data table table-striped no-margin">
+                    <thead>
+                        <tr class="text-center">
+                            <th>Fecha de Devolucion</th>
+                            <th>Observaciones</th>
+                            <th>Empleado</th>
+                         
+                            <th>Tiempo de Uso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if devueltos %}
+                            {% for dev in devueltos %}
+                                <tr>
+                                    <td class="text-center">{{ dev.fecha }}</td>
+                                    <td class="text-center">{% if dev.observaciones %}{{ dev.observaciones }}{% else %}Sin Observaciones{% endif %}</td>
+                                    <td class="text-center">{{ dev.empleado.first_name }} {{ dev.empleado.last_name }}  </td> 
+                                    <td class="text-center">
+                                      {% if dev.lapzo%}
+                                        {{ dev.lapzo }} dias
+                                      {% else %}
+                                        1 dias
+                                      {% endif %}  
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="17" class="text-center">No hay registrados.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+                </div>
+               
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% endif %}
+</div>
+</div>
+</div>
+<script>
+  const mainImage = document.getElementById('main-image');
+  const galleryItems = document.querySelectorAll('.gallery-item');
+  galleryItems.forEach(item => {
+    item.addEventListener('click', function() {
+      const clickedImageSrc = this.querySelector('img').src;
+      const currentGalleryItems = document.querySelectorAll('.gallery-item');
+      let imageExists = false;
+      currentGalleryItems.forEach(galleryItem => {
+        if (galleryItem.querySelector('img').src === mainImage.src) {
+          imageExists = true;
+        }
+      });
+      if (!imageExists) {
+        const newGalleryItem = document.createElement('a');
+        newGalleryItem.classList.add('gallery-item');
+        newGalleryItem.style.width = '100px';
+        newGalleryItem.style.height = '100px';
+        newGalleryItem.style.display = 'inline-block';
+        newGalleryItem.style.overflow = 'hidden';
+        const newImage = document.createElement('img');
+        newImage.src = mainImage.src;
+        newImage.style.width = '100%';
+        newImage.style.height = '100%';
+        newImage.style.objectFit = 'cover';
+        newGalleryItem.appendChild(newImage);
+        document.querySelector('.product_gallery').insertBefore(newGalleryItem, document.querySelector('.product_gallery').firstChild);
+      }
+      mainImage.src = clickedImageSrc;
+      this.remove();
+      addGalleryClickListeners();
+    });
+  });
+  function addGalleryClickListeners() {
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    galleryItems.forEach(item => {
+      item.addEventListener('click', function() {
+        const clickedImageSrc = this.querySelector('img').src;
+        const currentGalleryItems = document.querySelectorAll('.gallery-item');
+        let imageExists = false;
+        currentGalleryItems.forEach(galleryItem => {
+          if (galleryItem.querySelector('img').src === mainImage.src) {
+            imageExists = true;
+          }
+        });
+
+        if (!imageExists) {
+          const newGalleryItem = document.createElement('a');
+          newGalleryItem.classList.add('gallery-item');
+          newGalleryItem.style.width = '100px';
+          newGalleryItem.style.height = '100px';
+          newGalleryItem.style.display = 'inline-block';
+          newGalleryItem.style.overflow = 'hidden';
+          const newImage = document.createElement('img');
+          newImage.src = mainImage.src;
+          newImage.style.width = '100%';
+          newImage.style.height = '100%';
+          newImage.style.objectFit = 'cover';
+          newGalleryItem.appendChild(newImage);
+          document.querySelector('.product_gallery').insertBefore(newGalleryItem, document.querySelector('.product_gallery').firstChild);
+        }
+        mainImage.src = clickedImageSrc;
+        this.remove();
+      });
+    });
+  }
+
+  addGalleryClickListeners();
+
+
+  function mostrarResultados() {
+    var boton = document.getElementById('resultado');
+    boton.style.display = 'block'; 
+  }
+</script>
+    {% endblock %}

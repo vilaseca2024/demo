@@ -1,0 +1,50 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Equipo QRs</h3>
+        <br>
+    </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <form method="post" action="">
+        {% csrf_token %}
+        <label for="qr_data">Texto para el QR:</label>
+        <input type="text" id="qr_data" name="qr_data" required>
+        <button type="submit">Generar QR</button>
+    </form>
+  </div>
+  
+  <div class="col-md-12">
+  {% if qr_code_url %}
+  <img src="{{ qr_code_url }}" alt="Código QR" id="qr_image" style="height: 400px;">
+    <div class="col-md-12">
+        <button id="download_btn" class="btn btn-primary" onclick="downloadQR()">Descargar QR</button>
+      </div>
+    {% endif %}
+  </div>
+
+  <select class="form-control col-md-3" name="colores" id="colores">
+    <option value="" style="background-color: rgb(122, 255, 51); color: #fff;"><div ">14124</div> </option>
+    <option value="" style="background-color: rgb(255, 51, 51); color: #fff;"><div >46645363</div>  </option>
+    <option value="" style="background-color: rgb(51, 146, 255); color: #fff;"><div >14515464524</div>  </option>
+    <option value="" style="background-color: rgb(255, 51, 153); color: #fff;"><div >145641546345624</div>  </option>
+
+  </select>
+  
+</div>
+
+<script>
+    function downloadQR() {
+        const image = document.getElementById('qr_image');
+        const link = document.createElement('a');
+        link.href = image.src;
+        link.download = 'codigo_qr.png'; 
+        link.click();
+    }
+</script>
+
+  {% endblock %}

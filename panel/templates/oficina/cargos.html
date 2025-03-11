@@ -1,0 +1,507 @@
+
+
+{% extends 'menu.html' %}
+
+{% block content %}
+
+<a id="editar-link" style="display:none;" onclick="new PNotify({
+    title: 'Datos Editados',
+    text: 'Los datos editados se registraron y guardaron correctamente.',
+    icon: 'fa fa-edit fa-2x',  
+    styling: 'bootstrap3',
+});">Editar</a>
+<a id="success-link" style="display:none;" onclick="new PNotify({
+    title: 'Mensaje de Éxito',
+    text: 'Los datos del NUEVO CARGO se han agregado correctamente.',
+    type: 'success',
+    icon: 'fa fa-check-circle fa-2x',  
+    styling: 'bootstrap3'
+}); ">Posi</a>
+<a id="error-link" style="display:none;" onclick="new PNotify({
+    title: 'Oh No!',
+    text: 'Ocurrió un error al guardar los datos.',
+    type: 'error',
+    icon: 'fa fa-exclamation-triangle fa-2x', 
+    styling: 'bootstrap3'
+});">Error</a>
+<a id="activar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Activado',
+    text: 'Se activo el registro correctamente.',
+    type: 'info',
+    styling: 'bootstrap3',
+    icon: 'fa fa-plus-circle fa-2x',  
+    
+});">activar</a>
+
+<a id="desactivar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Desactivado',
+    text: 'Se desactivo el registro correctamente.',
+    type: 'error',
+    icon: 'fa fa-trash-o fa-2x', 
+    styling: 'bootstrap3'
+});">desactivar</a>
+
+<a id="subir-link" style="display:none;" onclick="new PNotify({
+    title: 'Archivo guardado correctamente',
+    text: 'La copia de seguridad se ha guardado correctamente',
+    type: 'info',
+    styling: 'bootstrap3',
+    addclass: 'dark',
+    icon: 'fa fa-envelope fa-2x',  
+});">desactivar</a>
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Listado de Cargos y Areas
+            <button class="btn btn-round btn-success " data-toggle="modal"
+            data-target="#agregar_cargo"><li class="fa fa-plus"></li> Agregar Nuevo Registro
+        </button>
+    </h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listar Backups</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                           
+                                
+                                <tr class="text-center">
+                                    <th>#</th>
+                                   
+                                    <th>Fecha</th>
+                                    <th>Cargo</th>
+                                    <th>Area</th>
+                                    <th>Planillado</th>
+                                    <th>Subpersonal</th>
+                                    <th>Activo</th>
+                                  
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">{{forloop.counter}}</td>
+                                    <td class="text-center">{{ dato.fecha_registro }}</td>
+                                    <td class="text-center">{{ dato.cargo }}</td>
+                                    <td class="text-center">{{ dato.area.area }}</td>
+                                    <td class="text-center">{{ dato.planillado }}</td>
+                                  
+                                    <td class="text-center">
+                                        {% if dato.subpersonal %}
+                                        <button class="btn-info" style="border: 0 solid white; border-radius: 20%;">SI</button>
+                                        {% else %}
+                                        <button class="btn-danger" style="border: 0 solid white; border-radius: 20%;">NO</button>
+                                        {% endif %}
+                                    </td>
+                              
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                       
+                                        <button class="btn btn-success btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#editModal"
+                                                data-id="{{ dato.id_area }}" 
+                                                data-id_correo="{{ dato.correo.id_u_correo }}"
+                                                data-disco="{{ dato.disco_duro.numero }}"
+                                                data-fecha="{{ dato.hasta|date:'Y-m-d' }}" 
+                                                data-desde="{{ dato.desde|date:'Y-m-d' }}"
+                                                data-motivo="{{ dato.motivo }}"
+                                                data-solicitante="{{ dato.solicitante }}"
+                                                data-obs="{{ dato.observaciones }}"
+                                                data-hasta="{{ dato.hasta|date:'Y-m-d' }}">  <!-- Aquí aseguramos que la fecha esté en formato 'YYYY-MM-DD' -->
+                                            <li class="fa fa-edit"></li>
+                                        </button>
+                                
+                                       
+                                        {% if dato.activo == 1 %}
+                                            <button class="btn btn-danger btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#eliminar"
+                                            data-id="{{ dato.id_area }}"  >
+                                                <li class="fa fa-trash"></li>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-info btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#activar"
+                                            data-id="{{ dato.id_area }}"  >
+                                                <li class="fa fa-plus-square-o"></li>
+                                            </button>
+                                        {% endif %}
+                                        
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA EDITAR REGISTRO -->
+<div class="modal fade bs-example-modal-lg" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog ">
+        <form action="editar_backups_correos" method="POST" id="demo-form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Editar datos de Backup</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body ">
+                    <div class="form-row">
+                       
+                        <div class="form-group col-md-12">
+                            <label for="correos_data_editar">Correos Coorporativos (*)</label>
+                            <select id="correos_data_editar" name="correos_data_editar" class="form-control" required>
+                                <option value="">Selecciona un correo</option>
+                                {% for correo in correos %}
+                                    <option value="{{ correo.id_u_correo }}">{{ correo.correo_usuario }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                       
+                        <div class="form-group col-md-6">
+                            <label for="fecha_desde_editar">Rango de fecha DESDE</label>
+                            <input type="date" id="fecha_desde_editar" name="fecha_desde_editar" class="form-control" required>
+                            <input type="hidden" id="id_editar" name="id_editar" class="form-control" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="fecha_hasta_editar">Rango de fecha HASTA</label>
+                            <input type="date" id="fecha_hasta_editar" name="fecha_hasta_editar" class="form-control" required>
+                        </div> 
+                        <div class="form-group col-md-12 ">
+                            <label for="numero_disco_editar">Numero de Disco (*)</label>
+                            <select class="form-control" id="numero_disco_editar" name="numero_disco_editar" required>
+                                <option value="">Seleccione un disco</option>
+                                {%for disco in discos%}
+                                    <option value="{{disco.id_disco}}">{{disco.numero}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12 ">
+                            <label for="tipo_nuevo_editar">Motivo de Backup (*)</label>
+                            <select id="tipo_nuevo_editar" name="tipo_nuevo_editar" class="form-control" style="width: 100%;" required>
+                                <option value="">Selecciona el Motivo</option>
+                                <option value="Retiro del Personal de la Empresa">Retiro del Personal de la Empresa</option>
+                                <option value="Cambio de funciones al Personal">Cambio de funciones al Personal</option>
+                                <option value="Limite de Capacidad de Almacenamiento">Limite de Capacidad de Almacenamiento</option>
+                                <option value="Solicitud interna de la alta direccion">Solicitud interna de la alta direccion</option>    
+                            
+                            </select>
+                           
+                        </div> 
+                        <div class="form-group col-md-12 ">
+                            <label for="solicitante_editar">Solicitante (*)</label>
+                            <select class="form-control" id="solicitante_editar" name="solicitante_editar" required>
+                                <option value="">Seleccione un empleado</option>
+                                {%for usuario in usuarios %}
+                                    <option value="{{usuario.first_name}} {{usuario.last_name}}">{{usuario.first_name}} {{usuario.last_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="observaciones_editar">Observaciones</label>
+                            <textarea class="form-control" id="observaciones_editar" name="observaciones_editar" style="height: 60px; padding: 5px; text-align: left; vertical-align: top;"></textarea>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg-asignar" id="ver_informe" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="agregar_archivo_backup" method="POST" id="demo-form2" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Backup de Correo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <h5><b>OPCION 1:</b> SUBE EL ARCHIVO</h5>
+                            <label for="archivo">Sube un archivo con el backup correspondiente</label>
+                            <input type="file" id="archivo" name="archivo" class="form-control" onchange="toggleEnlaceInput()">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped bg-primary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <input type="hidden" id="id_backup" name="id_backup" class="form-control"/>
+                        </div>
+                        <div class="form-group col-md-12 mt-4">
+                            <h5><b>OPCION 2:</b> INGRESA EL ENLACE DEL ARCHIVO</h5>
+                            <label for="enlace_archivo">Sube el enlace drive del archivo</label>
+                            <input type="text" id="enlace_archivo" name="enlace_archivo" class="form-control" placeholder="https://drive.google.com/drive/..." disabled>
+                        </div>
+                    </div>
+            
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+   
+    function toggleEnlaceInput() {
+        var archivoInput = document.getElementById('archivo');
+        var enlaceInput = document.getElementById('enlace_archivo');
+        if (archivoInput.files.length > 0) {
+            enlaceInput.disabled = true;
+        } else {
+            enlaceInput.disabled = false;
+        }
+    }
+    
+    document.getElementById('demo-form2').addEventListener('submit', function (event) {
+        var progressBar = document.querySelector('.progress-bar');
+        var progress = 0;
+        
+        var interval = setInterval(function () {
+            if (progress < 100) {
+                progress += 0.8;
+                progressBar.style.width = progress + '%';
+                progressBar.setAttribute('aria-valuenow', progress);
+            } else {
+                clearInterval(interval);
+            }
+        }, 500);
+    });
+</script>
+
+
+<div class="modal fade bs-example-modal-lg" id="eliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="eliminar_cargo" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Confirma si deseas desactivar este Registro de Informe?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_eliminar" id="id_eliminar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Desactivar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="activar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="activar_cargo" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-plus-square-o"></li>
+                        <h4 class="mt-2">Confirma si deseas Activar este Registro de Informe?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_activar" id="id_activar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Activar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="agregar_cargo" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="agregar_empresa_datos" method="POST" id="demo-form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar nuevo Cargo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body mt-2">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="cargo">Cargo (*)</label>
+                            <input type="text" id="cargo" name="cargo" class="form-control" style="text-transform: uppercase;" required>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="area">Area (*)</label>
+                            <select id="area" name="area" class="selectize" required>
+                                <option value="">Selecciona un Area dentro de la empresa</option>
+                                {% for area in areas %}
+                                    <option value="{{ area.id_area }}">{{ area.area }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                       
+                        <div class="form-group col-md-12 ">
+                            <label for="planillado">Planillado (*)</label>
+                            <select class="selectize" id="planillado" name="planillado" required>
+                                <option value="">Seleccione una opcion</option>
+                            
+                                <option value="EN PLANILLA">EN PLANILLA</option>
+                                <option value="COMPLEMENTARIO">COMPLEMENTARIO</option>
+                            </select>
+                        </div>
+                       
+                        <div class="form-group col-md-12">
+                            <label for="personal_cargo">Cuenta con personal a Cargo? (*)</label>
+                            <select class="selectize" id="personal_cargo" name="personal_cargo" required>
+                                <option value="">Seleccione una opcion</option>
+                            
+                                <option value="1">SI</option>
+                                <option value="0">NO</option>
+                            </select>
+                        </div>
+                     
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    
+$('#editModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);   
+    var id_datos = button.data('id'); 
+    var id_correo = button.data('id_correo');
+    var fecha = button.data('fecha');
+    var desde = button.data('desde');
+    var motivo = button.data('motivo');
+    var solicitante = button.data('solicitante');
+    var hasta = button.data('hasta');
+    var obs = button.data('obs');
+           
+    $('#observaciones_editar').val(obs);
+    $('#solicitante_editar').val(solicitante);
+    $('#tipo_nuevo_editar').val(motivo);
+    $('#numero_disco_editar').val(id_datos);
+    $('#fecha_desde_editar').val(desde);
+    $('#fecha_hasta_editar').val(hasta);
+    $('#correos_data_editar').val(id_correo);
+    $('#id_editar').val(id_datos);
+
+    
+});      
+    $('#eliminar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_eliminar').val(id_datos);
+    });
+    $('#activar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_activar').val(id_datos);
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        if (document.getElementById('success-link') && '{{ request.GET.success }}') {
+            document.getElementById('success-link').click();
+        }
+        if (document.getElementById('error-link') && '{{ request.GET.error }}') {
+            document.getElementById('error-link').click();
+        }
+        if (document.getElementById('editar-link') && '{{ request.GET.editar }}') {
+            document.getElementById('editar-link').click();
+        }
+        if (document.getElementById('asignar-link') && '{{ request.GET.asignar }}') {
+            document.getElementById('asignar-link').click();
+        }
+        if (document.getElementById('devolver-link') && '{{ request.GET.devolver }}') {
+            document.getElementById('devolver-link').click();
+        }
+        if (document.getElementById('activar-link') && '{{ request.GET.activar }}') {
+            document.getElementById('activar-link').click();
+        }
+        if (document.getElementById('desactivar-link') && '{{ request.GET.desactivar }}') {
+            document.getElementById('desactivar-link').click();
+        }
+
+        $('#correos_data').selectize();
+        $('#personal_cargo').selectize();
+        $('#tipo_nuevo').selectize();
+        $('#solicitante').selectize();
+        $('#area').selectize();
+        $('#planillado').selectize();
+        
+        
+    });
+
+    $('#ver_informe').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id'); 
+        $('#id_backup').val(id_datos); 
+        
+    });  
+   
+     
+</script>
+
+{% endblock %}

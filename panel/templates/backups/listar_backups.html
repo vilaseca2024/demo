@@ -1,0 +1,413 @@
+{% extends 'menu.html' %}
+
+{% block content %}
+<a id="success-link" style="display:none;" onclick="new PNotify({
+    title: 'Éxito',
+    text: 'El INFORME del equipo para la evaluacion del BACKUP ha agregado correctamente.',
+    type: 'info',
+    icon: 'fa fa-check-circle fa-2x',  
+    styling: 'bootstrap3'
+}); ">Posi</a>
+<a id="error-link" style="display:none;" onclick="new PNotify({
+    title: 'Oh No!',
+    text: 'Ocurrió un error al guardar los datos.',
+    type: 'error',
+    icon: 'fa fa-exclamation-triangle fa-2x', 
+    styling: 'bootstrap3'
+});">Error</a>
+<a id="activar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Activado',
+    text: 'Se activo el registro correctamente.',
+    type: 'info',
+    styling: 'bootstrap3',
+    icon: 'fa fa-plus-circle fa-2x',  
+    
+});">activar</a>
+
+<a id="desactivar-link" style="display:none;" onclick="new PNotify({
+    title: 'Registro Desactivado',
+    text: 'Se desactivo el registro correctamente.',
+    type: 'error',
+    icon: 'fa fa-trash-o fa-2x', 
+    styling: 'bootstrap3'
+});">desactivar</a>
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+        <h3>Estado por periodos de Equipos 
+            <!-- <button class="btn btn-round btn-success " data-toggle="modal"
+            data-target=".bs-example-modal-lg"><li class="fa fa-plus"></li> Agregar Registro e Informacion
+        </button> -->
+    </h3>
+        <br>
+    </div>
+</div>
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listar Equipos de Oficina</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>Codigo de Equipo</th>
+                                    <th>Fecha de Modificacion</th>
+                                    <th>Nombre</th>
+                                    <th>Estado</th>
+                                    <th >Ultimo informe</th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td class="text-center">{{ dato.equipo.codigo_equipo }}</td>
+                                    <td class="text-center">{{ dato.fecha }}</td>
+                                    <td class="text-center">{{ dato.equipo.nombre }}</td>
+                                    <td class="text-center">
+                                        {% if dato.estado == 0 %}
+                                        <span class="badge badge-primary">
+                                            Requiere Backup
+                                        </span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">
+                                            Funcionamiento Normal
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    {% if dato.informe_drive %}
+                                    <td class="text-center" style="display: inline-block;
+                                    max-width: 350px; 
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space: nowrap;"><a href="{{ dato.informe_drive }}" target="_blank"><li class="fa fa-external-link"></li> {{ dato.informe_drive }}</a></td>
+                                    {% else %}
+                                    <td>Carga el primer informe</td>
+                                    {% endif %}
+                                    <td class="text-center">
+                                        {% if dato.activo %}
+                                            <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% else %}
+                                            <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-primary btn-sm" 
+                                                data-toggle="modal" 
+                                                data-target="#ver_informe"
+                                                data-id="{{ dato.id_estado_b }}"  >
+                                            <li class="fa fa-cloud-upload"></li>  
+                                        </button>
+                                       
+                                        {% if dato.activo == 1 %}
+                                            <button class="btn btn-danger btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#eliminar"
+                                            data-id="{{ dato.id_estado_b }}"  >
+                                                <li class="fa fa-trash"></li>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-info btn-sm"
+                                            data-toggle="modal" 
+                                            data-target="#activar"
+                                            data-id="{{ dato.id_estado_b }}"  >
+                                                <li class="fa fa-plus-square-o"></li>
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg-asignar" id="ver_informe" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="agregar_informe_backup" method="POST" id="demo-form2" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Evaluar Equipo</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="subir_informe">Sube un archivo CSV para visualizar la información correspondiente</label>
+                            <input type="file" id="subir_informe" name="subir_informe" class="form-control">
+                            <input type="hidden" id="data_total_toma" name="data_total_toma" class="form-control"/>
+                            <input type="hidden" id="id_backup" name="id_backup" class="form-control"/>
+                        </div>
+                    </div>
+                    <div id="oculto" name="oculto" style="display: none;">
+                    <div style="max-height: 400px; overflow-y: auto; margin-top: 20px; border: 0.5px #6c757d solid;">
+                        <table id="csv-table" class="table table-striped jambo_table bulk_action">
+                            <thead>
+                                <tr id="csv-header" class="text-center">
+                                </tr>
+                            </thead>
+                            <tbody id="csv-body" class="text-center">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="evaluation-summary" style="margin-top: 20px; font-size: 16px;">
+                        <h5><strong>Evaluación del estado del equipo:</strong></h5>
+                        <div id="space-evaluation"></div>
+                        <div id="uptime-evaluation"></div>
+                        <div id="processor-evaluation"></div>
+                        <div id="memory-evaluation"></div>
+                        <div id="disk-evaluation"></div>
+                    </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" id="eliminar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="eliminar_informe_backup" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-exclamation-triangle"></li>
+                        <h4 class="mt-2">Confirma si deseas desactivar este Registro de Informe?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_eliminar" id="id_eliminar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Desactivar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-lg" id="activar" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="form-seleccionados" action="activar_informe_backup" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mt-4">
+                        <li class="fa fa-5x fa-plus-square-o"></li>
+                        <h4 class="mt-2">Confirma si deseas Activar este Registro de Informe?</h4>
+                    </div>
+                        
+                    <input type="hidden" name="id_activar" id="id_activar">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Activar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script>
+    $('#eliminar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_eliminar').val(id_datos);
+    });
+    $('#activar').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id');    
+        $('#id_activar').val(id_datos);
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        if (document.getElementById('success-link') && '{{ request.GET.success }}') {
+            document.getElementById('success-link').click();
+        }
+        if (document.getElementById('error-link') && '{{ request.GET.error }}') {
+            document.getElementById('error-link').click();
+        }
+        if (document.getElementById('activar-link') && '{{ request.GET.activar }}') {
+            document.getElementById('activar-link').click();
+        }
+        if (document.getElementById('desactivar-link') && '{{ request.GET.desactivar }}') {
+            document.getElementById('desactivar-link').click();
+        }
+    });
+    $('#ver_informe').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);   
+        var id_datos = button.data('id'); 
+        $('#id_backup').val(id_datos)  
+        
+    });  
+    document.getElementById('subir_informe').addEventListener('change', function(event) {
+    var file = event.target.files[0];
+    $('#oculto').css('display', 'block');
+
+    if (file && file.type === 'text/csv') {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var content = e.target.result;
+            Papa.parse(content, {
+                header: true, 
+                dynamicTyping: true, 
+                complete: function(results) {
+                    generateCSVTable(results.data);
+                    evaluateBackupNeed(results.data);
+                }
+            });
+        };
+        reader.readAsText(file);
+    } else {
+        alert('Por favor, selecciona un archivo CSV válido.');
+    }
+});
+
+function generateCSVTable(data) {
+    var tableHeader = document.getElementById('csv-header');
+    var tableBody = document.getElementById('csv-body');
+    tableHeader.innerHTML = '';
+    tableBody.innerHTML = '';
+
+    if (data.length > 0) {
+        var headers = Object.keys(data[0]);
+        headers.forEach(function(header) {
+            var th = document.createElement('th');
+            th.textContent = header;
+            tableHeader.appendChild(th);
+        });
+
+        data.forEach(function(row) {
+            var tr = document.createElement('tr');
+            headers.forEach(function(header) {
+                var td = document.createElement('td');
+                td.textContent = row[header] || '';
+                tr.appendChild(td);
+            });
+            tableBody.appendChild(tr);
+        });
+    }
+}
+
+function evaluateBackupNeed(data) {
+    var evaluations = [];
+
+    var freeSpace = getCSVValueByName(data, "Free Space");
+    var totalSpace = getCSVValueByName(data, "Total Space");
+    var op1 = 0;
+    var op2 = 0;
+    var op3 = 0;
+    var op4 = 0;
+    var op5 = 0;
+    if (freeSpace && totalSpace) {
+        freeSpace = parseFloat(freeSpace);
+        totalSpace = parseFloat(totalSpace);
+
+        if (!isNaN(freeSpace) && !isNaN(totalSpace)) {
+            var freeSpacePercentage = (freeSpace / totalSpace) * 100;
+            evaluations.push(freeSpacePercentage < 20 ?
+                "¡Cuidado! El espacio libre en el disco es bajo (" + freeSpacePercentage.toFixed(2) + "%). Se recomienda realizar un backup." :
+                "Espacio libre en el disco suficiente (" + freeSpacePercentage.toFixed(2) + "%).");
+            var op1 = freeSpacePercentage < 20 ? 1 : 0;
+        } else {
+            evaluations.push("Error en los datos de espacio de disco.");
+        }
+    }
+
+    var uptime = getCSVValueByName(data, "System Uptime");
+    if (uptime) {
+        var uptimeDays = parseInt(uptime.split(" ")[0]);
+        evaluations.push(uptimeDays > 5 ?
+            "El sistema lleva más de 5 días sin reiniciar (" + uptimeDays.toFixed(2) + "%). Se recomienda realizar un backup por precaución." :
+            "El sistema tiene un tiempo de actividad aceptable. (" + uptimeDays.toFixed(2) + " dias)");
+        var op2 = uptimeDays > 5 ? 1 : 0;
+    }   
+
+    var numProcessors = getCSVValueByName(data, "Number Of Processors");
+    evaluations.push(numProcessors && numProcessors < 2 ?
+        "El equipo tiene un solo procesador. El rendimiento podría estar limitado, lo que podría afectar el funcionamiento. Considera realizar un backup." :
+        "Número de procesadores adecuado para el funcionamiento del equipo.");
+    var op3 = numProcessors && numProcessors < 2 ? 1 : 0;
+    var freeMemory = getCSVValueByName(data, "Free Memory");
+    if (freeMemory) {
+        freeMemory = parseFloat(freeMemory);
+        evaluations.push(freeMemory < 1000 ?
+            "La memoria libre es baja. El rendimiento del equipo podría verse afectado. Se recomienda hacer un backup." :
+            "Memoria suficiente disponible.");
+        var op4 = freeMemory < 1000 ? 1 : 0;
+    }
+
+    var diskType = getCSVValueByName(data, "Disk Type");
+    var capacity = getCSVValueByName(data, "Capacity");
+    if (capacity) {
+        capacity = parseFloat(capacity);
+    }
+    evaluations.push(diskType === "Fixed hard disk media" && capacity && capacity < 500000 ?
+        "El equipo tiene un disco HDD de baja capacidad. Podría ser propenso a fallos, realizar un backup es recomendable." :
+        "El tipo de disco y capacidad son adecuados para el equipo.");
+    var op5 = diskType === "Fixed hard disk media" && capacity && capacity < 500000 ? 1 : 0;
+
+    var total = op1+op2+op3+op4+op5;
+    $('#data_total_toma').val(total);
+    var evaluationSummary = document.getElementById('evaluation-summary');
+    evaluationSummary.innerHTML = "<h5><strong>Evaluación del estado del equipo:</strong></h5>";
+    
+    var ul = document.createElement('ul');
+    evaluations.forEach(function(evaluation) {
+        var li = document.createElement('li');
+        li.textContent = evaluation; 
+        ul.appendChild(li); 
+    });
+
+    evaluationSummary.appendChild(ul);  
+}
+
+function getCSVValueByName(data, name) {
+    for (var i = 0; i < data.length; i++) {
+        if (data[i].ItemName === name) {
+            return data[i].ItemValue1 || data[i].ItemValue2 || data[i].ItemValue3 || data[i].ItemValue4 || data[i].ItemValue5;
+        }
+    }
+    return null;
+}
+</script>
+
+{% endblock %}

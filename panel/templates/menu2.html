@@ -1,0 +1,330 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="{% static '/img/favicon.ico' %}" type="image/ico" />
+
+  <title>Sistema VILASECA</title>
+
+    <!-- Bootstrap -->
+    <link href="{% static '/FrWork/admin_lte/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static '/FrWork/admin_lte/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="{% static '/FrWork/admin_lte/vendors/nprogress/nprogress.css' %}" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="{% static '/FrWork/admin_lte/vendors/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+	
+    <!-- bootstrap-progressbar -->
+    <link href="{% static '/FrWork/admin_lte/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="{% static '/FrWork/admin_lte/vendors/jqvmap/dist/jqvmap.min.css' %}" rel="stylesheet"/>
+    <!-- bootstrap-daterangepicker -->
+    <link href="{% static '/FrWork/admin_lte/vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/build/css/custom.min.css' %}" rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}"  rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}"  rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}"  rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}"  rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}"  rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+	  <link href="{% static '/FrWork/admin_lte/vendors/switchery/dist/switchery.min.css' %}" rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/pnotify/dist/pnotify.css' %}" rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/pnotify/dist/pnotify.buttons.css' %}" rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/pnotify/dist/pnotify.nonblock.css' %}" rel="stylesheet">
+    <link href="{% static '/FrWork/admin_lte/vendors/leaflet/leaflet.css' %}" rel="stylesheet">
+    <script src="{% static '/FrWork/admin_lte/vendors/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static '/FrWork/admin_lte/vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static '/FrWork/admin_lte/vendors/leaflet/leaflet.js' %}"></script>
+    <script src="{% static '/FrWork/admin_lte/vendors/Chart.js/dist/Chart.min.js' %}"></script>
+    <script src="{% static '/FrWork/admin_lte/vendors/echarts/dist/echarts.min.js' %}"></script>
+    <script src="{% static '/FrWork/admin_lte/vendors/echarts/map/js/world.js' %}"></script>
+    <script src="{% static '/FrWork/admin_lte/vendors/otros/bootstrap.min.js' %}"></script>
+    <script src="{% static '/FrWork/admin_lte/vendors/otros/popper.min.js' %}"></script>
+    
+  </head>
+  <body class="nav-md">
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              {% if request.session.grupo_data == 'Administradores' %}
+              <a href="../../../dashboard" class="site_title"><img src="{% static '/img/image.png' %}" style="height: 25px;"/><span>RRHH-Vilaseca</span></a>
+              {% else %}
+              <a href="../../../dashboard_empleados" class="site_title"><img src="{% static '/img/image.png' %}" style="height: 25px;"/><span>RRHH-Vilaseca</span></a>
+              {% endif%}
+             
+            </div>
+            <div class="clearfix"></div>
+            <div class="profile clearfix">
+              <div class="profile_pic">
+                {% if request.session.foto_url %}
+                  
+                  <img src="{{request.session.foto_url}}" alt="..." class="img-circle profile_img">
+                {% else %}
+                  <img src="{% static '/img/usuario.png' %}" alt="..." class="img-circle profile_img">
+                {% endif %}
+              </div>
+              <div class="profile_info">
+                <span>Bienvenido,</span>
+                <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+              </div>
+            </div>
+            <br />
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <h3>General</h3>
+                <ul class="nav side-menu">
+
+                  
+                  {% if request.session.grupo_data == 'Administradores' %}
+                  <li><a href="../../../dashboard"><i class="fa fa-home"></i> Inicio </a>
+                  </li>
+                  <li><a><i class="fa fa-tasks"></i> Datos Administrativos <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="../../../departamento">Departamento/Ciudad</a></li>
+                      <li><a href="../../../clasificacion_edad"> Clasificacion por Edad</a>
+                      </li>
+                      <li><a href="../../../clasificacion_antiguedad">Clasificacion por Antiguedad</a>
+                      </li>
+                      <li><a href="../../../clasificacion_generacion">Clasificacion por Generacion</a>
+                      </li>
+                      <li><a href="../../../genero">Genero</a></li>
+                      <li><a href="../../../civil">Estado Civil</a></li>
+                      <li><a href="../../../tipo_contrato">Tipo de Contrato</a>
+                      <li><a href="../../../clasificacion_file">Clasificacion de Documentos</a>
+                      <li><a href="../../../tipo_registro">Tipo de Registro</a>
+                      </li>
+  
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-users"></i> Usuario <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="../../../empleados">Lista de Usuarios</a></li>  
+                      <li><a href="../../../roles">Roles de Usuarios</a></li>
+                      <li><a href="../../../permisos">Permisos Adicionales</a></li>
+                      <li><a href="../../../reportes_usuarios">Reportes</a></li>
+                    </ul>
+                  </li>
+                  {% endif %}
+                  {% if tiene_permiso_empleados or request.session.grupo_data == 'Administradores'%}
+                  
+                  </li>
+                      <li>
+                          <a><i class="fa fa-users"></i> Empleados <span class="fa fa-chevron-down"></span></a>
+                          <ul class="nav child_menu">
+                              <li><a href="../../../agregar_nuevo_empleado">Agregar Empleado</a></li>
+                              <li><a href="../../../lista_empleados">Lista Maestra</a></li>
+                              <li><a href="../../../personal_actual">Contactos Personal</a></li>
+                              <li><a href="../../../datos_contrato">Datos de Contrato</a></li>
+                              <li><a href="../../../mapa_empleados">Ver Mapa de Empleados</a></li>
+                              <li><a href="../../../estadisticas">Estadísticas</a></li>
+                          </ul>
+                      </li>
+                    {% endif %}
+                  {% if request.session.grupo_data == 'Empleados' %}                 
+                  <li><a href="../../../../../../dashboard_empleados"><i class="fa fa-home"></i> Inicio </a>
+                  </li>    
+                  <li>
+                        <a><i class="fa fa-users"></i> Empleados <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="../../../perfil">Perfil de Usuario</a></li>
+                            <li><a href="../../../lista_maestra">Lista Maestra</a></li>
+                            <li><a href="../../../personal_actual_empleado">Contactos Personal</a></li>
+                        </ul>
+                    </li>
+                  {% endif %}
+                  {% if request.session.grupo_data == 'Administradores' %}
+                  <li><a><i class="fa fa-file"></i> File Personal<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="../../../documento">Cargar documentos de empleado</a></li>
+                    </ul>
+                  </li>
+                  {% endif %}
+                  {% if request.session.grupo_data == 'Empleados' %}
+                  <li><a><i class="fa fa-file"></i> File Personal<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="../../../documento_empleados">Cargar documentos de empleado</a></li>
+                    </ul>
+                  </li>
+                  {% endif %}
+                  {% if request.session.grupo_data == 'Administradores' %}
+                  <li><a><i class="fa fa-certificate"></i> Certificados de trabajo<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="../../../solicitud_admi">(admi) Solicitudes de Certificados</a></li>
+                      <li><a href="../../../certificado">Certificados</a></li>
+                      <li><a href="../../../cierre">Cierre de Gestion</a></li>
+                      <li><a href="../../../reporte">Reportes</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-certificate"></i>Equipos y Maquinas<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="../../../listar_equipos">Lista de Equipos</a></li>
+
+                      <li><a href="../../../buscar_equipo">Buscar Equipo</a></li>
+                      <!-- <li><a href="../../../detalle_equipo">Caracteristica del Equipo</a></li>
+                      <li><a href="../../../detalle_equipo_2">Registro Equipos</a></li> -->
+                      <li><a href="../../../generar_contrasenas">Generar Password</a></li>
+                     
+                      
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-desktop"></i>Asignacion de Usuarios<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="#">Correos Corporativos</a></li>
+                      <li><a href="#">Equipos y Perifericos</a></li>
+                      <li><a href="#">Alarmas</a></li>
+                      <li><a href="#">Sistemas Informaticos</a></li>
+                      <li><a href="#">Usuarios para Teletrabajo</a></li>
+                    </ul>
+                  </li>
+                  {% endif %}
+                  {% if request.session.grupo_data == 'Empleados' %}
+                  <li><a><i class="fa fa-certificate"></i> Certificados de trabajo<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="../../../../../../solicitud">Solicitudes de Certificados</a></li>
+                      <li><a href="../../../../../../certificado_empleados">Certificados</a></li>
+                    </ul>
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="Settings">
+                  <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                  <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Lock">
+                  <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+              </a>
+                <a href="#" data-toggle="tooltip" data-placement="top" title="Cerrar Sesion" onclick="document.getElementById('logout-form').submit();"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a>
+                <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                    {% csrf_token %}
+                </form>
+          </div>
+          </div>
+        </div>
+        <div class="top_nav">
+          <div class="nav_menu">
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+              <nav class="nav navbar-nav">
+              <ul class=" navbar-right">
+                <li class="nav-item dropdown open" style="padding-left: 15px;">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
+                    {% if request.session.foto_url %}
+                      <img src="{{request.session.foto_url}}" alt="">{{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                     <img src="{% static '/img/usuario.png' %}" alt="">{{ user.first_name }} {{ user.last_name }}
+                    {% endif %}
+                  </a>
+                  <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item"  href="perfil"> 
+                      <span class="fa fa-user mt-1 pull-right"> </span>
+                      Perfil de Usuario
+                    </a>
+                      <a class="dropdown-item"  href="javascript:;">
+                        <span class="fa fa-cog mt-1 pull-right"> </span>
+                        <span>Ajustes</span>
+                      </a>
+                  <a class="dropdown-item"  href="javascript:;">
+                    <span class="fa fa-question-circle  mt-1 pull-right"> </span>
+                    Ayuda</a>
+                    <a class="dropdown-item"  href="logout"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesion</a>
+                  </div>
+                </li>
+ 
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <div class="right_col" role="main">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <footer>
+          <div class="pull-right">
+            Gentelella - Bootstrap Admin Template by <a href="https://colorlib.com">Colorlib</a>
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+      </div>
+    </div>
+<!-- FastClick -->
+<script src="{% static '/FrWork/admin_lte/vendors/fastclick/lib/fastclick.js' %}"></script>
+<!-- NProgress -->
+<script src="{% static '/FrWork/admin_lte/vendors/nprogress/nprogress.js' %}"></script>
+<!-- Chart.js -->
+
+<!-- gauge.js -->
+<script src="{% static '/FrWork/admin_lte/vendors/gauge.js/dist/gauge.min.js' %}"></script>
+<!-- bootstrap-progressbar -->
+<script src="{% static '/FrWork/admin_lte/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>
+<!-- iCheck -->
+<script src="{% static '/FrWork/admin_lte/vendors/iCheck/icheck.min.js' %}"></script>
+<!-- Skycons -->
+<script src="{% static '/FrWork/admin_lte/vendors/skycons/skycons.js' %}"></script>
+<!-- Flot -->
+<script src="{% static '/FrWork/admin_lte/vendors/Flot/jquery.flot.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/Flot/jquery.flot.pie.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/Flot/jquery.flot.time.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/Flot/jquery.flot.stack.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/Flot/jquery.flot.resize.js' %}"></script>
+<!-- Flot plugins -->
+<script src="{% static '/FrWork/admin_lte/vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/flot.curvedlines/curvedLines.js' %}"></script>
+<!-- DateJS -->
+<script src="{% static '/FrWork/admin_lte/vendors/DateJS/build/date.js' %}"></script>
+<!-- JQVMap -->
+<script src="{% static '/FrWork/admin_lte/vendors/jqvmap/dist/jquery.vmap.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="{% static '/FrWork/admin_lte/vendors/moment/min/moment.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="{% static '/FrWork/admin_lte/build/js/custom.min.js' %}"></script>
+
+
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/jszip/dist/jszip.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/iCheck/icheck.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/switchery/dist/switchery.min.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/pnotify/dist/pnotify.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/pnotify/dist/pnotify.buttons.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/pnotify/dist/pnotify.nonblock.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js' %}"></script>
+<script src="{% static '/FrWork/admin_lte/vendors/jquery.tagsinput/src/jquery.tagsinput.js' %}"></script>
+
+
+<script src="{% static '/FrWork/admin_lte/vendors/dropzone/dist/min/dropzone.min.js' %}"></script>
+
+  
+</body>
+</html>
+

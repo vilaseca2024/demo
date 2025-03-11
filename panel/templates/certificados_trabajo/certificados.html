@@ -1,0 +1,465 @@
+{% extends 'menu.html' %}
+{% load static %}
+{% block content %}
+<div class="page-title">
+    <div class="col-md-12 mx-3">
+
+        <h3>Certificados de Trabajo {% if grupo == 'Administradores' %}<button class="btn btn-round btn-info" data-toggle="modal"
+                data-target=".bs-example-modal-lg">
+                <li class="fa fa-plus"></li> Nuevo Certificado 
+            </button>{% endif %} </h3>
+        <br>
+    </div>
+
+</div>
+<div class="col-md-12 col-sm-12 ">
+    {% if mensaje %}
+    
+        <div class="alert alert-info alert-dismissible " role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+            </button>
+            <strong>MENSAJE </strong><li class="fa fa-danger"></li> {{mensaje}}
+        </div>
+
+    {% endif %}
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Listado de Certificados de Trabajo </h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
+                            class="fa fa-wrench"></i></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Settings 1</a>
+                        <a class="dropdown-item" href="#">Settings 2</a>
+                    </div>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-box table-responsive">
+
+                        <table id="datatable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Ultima Modificacion</th>
+                                    <th>Codigo</th>
+                                    <th>Gestion</th>
+                                    <th>Dirigido</th>
+                                    <th>Emitido</th>
+                                    <th>Adjunto</th>
+                                    <th>Tipo</th>
+                                    <th>Usuario</th>
+                                    <th>Activo</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datos %}
+                                {% for dato in datos %}
+                                <tr>
+                                    <td>{{ dato.id_certificado_a }}</td>
+                                    <td>{{ dato.fecha_emision }}</td>
+                                    <td>{{ dato.codigo }}</td>
+                                    <td>{{ dato.gestion }}</td>
+                                    <td>{{ dato.dirigido }}</td>
+                                    <td>{{ dato.emitido }}</td>
+                                    <td class="text-center">
+                                        {% if dato.drive == null %}
+                                        <a href="#" data-toggle="modal"
+                                            data-target=".bs-example-modal-lg-{{ dato.id_certificado_a}}" ><span
+                                                class="badge badge-warning" style="font-size: 12px;">
+                                                <li class="fa fa-upload"></li> Sin Adjunto / Cargar PDF
+                                            </span></a>
+                                        {% endif %}
+                                        {% if dato.drive == 'ANULADO' %}
+                                            <span style="font-size: 12px;"
+                                                class="badge badge-danger"  data-toggle="tooltip" data-placement="bottom" title="" 
+                                                data-original-title="Este certificado fue anulado para mas informacion contactese con un Administrador">
+                                                
+                                                <li class="fa fa-warning"></li> ANULADO
+                                            </span>
+                                            
+                                        {% endif %}
+                                        {% if dato.drive != null and dato.drive != 'ANULADO' %}
+                                       
+                                        <a href="{{ dato.drive }}"
+                                            download="{{ dato.codigo }}_certificado.pdf">
+                                            <span class="badge badge-primary" style="font-size: 12px;"  data-toggle="tooltip" data-placement="bottom" title="" 
+                                            data-original-title="Presiona para descargar una copia en PDF del certificado subido">
+                                                <li class="fa fa-download"></li> Descargar Documento
+                                            </span>
+                                        </a>
+                                        {% endif %}
+
+                                    </td>
+                                    <td>{{ dato.referencia }}</td>
+                                    <td>{{ dato.usuario_modificado.first_name }} {{ dato.usuario_modificado.last_name }}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if dato.activo == 1 %}
+                                        <li class="fa fa-check fa-2x" style="color: blue;"></li>
+                                        {% endif %}
+                                        {% if dato.activo == 0 %}
+                                        <li class="fa fa-times fa-2x" style="color: red;"></li>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target=".bs-example-modal-sm-show-editar-{{ dato.id_certificado_a }}" {% if dato.cierre == 0 %} disabled {% endif %}>
+                                            <li class="fa fa-edit"></li> 
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-toggle="modal"
+                                            data-target=".bs-example-modal-sm-show-{{ dato.id_certificado_a }}">
+                                            <li class="fa fa-trash"></li>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="nuevo_certificado" method="POST" id="demo-form2">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Nuevo Certificado</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="dirigido">Dirigido <span
+                                class="required">*</span></label>
+                        <div class="col-md-8 col-sm-8">
+                            <select id="dirigido" name="dirigido" class="form-control" required>
+                                <option value="">Selecciona un nombre...</option>
+                                {% for user in usuarios %}
+                                <option value="{{ user.id }}" data-email="{{ user.email }}">{{ user.first_name }} {{user.last_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="gestion">
+                            Gestión del Certificado <span class="required">*</span>
+                        </label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="gestion" class="form-control" type="number" name="gestion" 
+                                   placeholder="Gestión del certificado" min="1990" max="2050" required value="2024">
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="emitido">Emitido por:<span
+                                class="required">*</span>
+                        </label>
+                        <div class="col-md-8 col-sm-8 ">
+                            <select id="emitido" name="emitido" class="form-control" required>
+                                <option value="">Selecciona un nombre...</option>
+                                {% for user in usuarios %}
+                                <option value="{{user.first_name}} {{user.last_name}}">{{user.first_name}}
+                                    {{user.last_name}}</option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+
+                    </div>
+
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align">Fecha de Emitido <span
+                                class="required">*</span>
+                        </label>
+                        <!-- <div class="col-md-8 xdisplay_inputx form-group row has-feedback mx-1">
+                                <input type="text" class="form-control has-feedback-left" id="single_cal2" placeholder="First Name" aria-describedby="inputSuccess2Status2">
+                                <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>
+                                <span id="inputSuccess2Status2" class="sr-only">(success)</span>
+                              </div> -->
+
+                        <div class="col-md-8 col-sm-8 ">
+
+                            <input id="fecha_registro" name="fecha_registro" class="date-picker form-control"
+                                placeholder="dd-mm-yyyy" type="text" required="required" type="text"
+                                onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'"
+                                onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                            <script>
+                                function timeFunctionLong(input) {
+                                    setTimeout(function () {
+                                        input.type = 'text';
+                                    }, 60000);
+                                }
+                            </script>
+                        </div>
+                    </div>
+
+                    <div class="item form-group">
+                        <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">Correo<span
+                                class="required">*</span></label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="email" class="form-control" type="email" name="email"
+                                placeholder="Correo del usuario">
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">Referencia<span
+                                class="required">*</span></label>
+                        <div class="col-md-8 col-sm-8 ">
+                            <select id="referencia" name="referencia" class="form-control" required>
+                                <option value="">Selecciona un Tipo...</option>
+                                <option value="Certificado de Trabajo">Certificado de Trabajo</option>
+                                <option value="Certificado de Pasantia">Certificado de Pasantia</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">Usuario<span
+                                class="required">*</span></label>
+                        <div class="col-md-8 col-sm-8 ">
+                            <input id="usuario" class="form-control" type="text" name="usuario" readonly
+                                value="{{ user.first_name }} {{ user.last_name }}">
+                            <input id="id_usuario" class="form-control" type="hidden" name="id_usuario" readonly
+                                value="{{ user.id }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% for dato in datos %}
+<div class="modal fade bs-example-modal-lg-{{ dato.id_certificado_a}}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form action="cargar_documento" method="POST" id="demo-form2" enctype="multipart/form-data">
+
+            {% csrf_token %}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Adjuntar Certificado PDF</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"
+                            for="adjunto_{{ dato.id_certificado_a }}">Selecciona el documento <span
+                                class="required">*</span></label>
+                        <div class="col-md-8 col-sm-8 ">
+                            <input type="hidden" id="id_certificado" name="id_certificado"
+                                value="{{ dato.id_certificado_a }}">
+                            <input type="file" id="adjunto_{{ dato.id_certificado_a }}" name="adjunto"
+                                required="required" class="form-control" accept="application/pdf">
+
+
+                        </div>
+                    </div>
+                    <div>
+                        <iframe id="vista_{{ dato.id_certificado_a }}" name="vista" src="{% static 'img/test.pdf' %}"
+                            style="width:100%; height:420px;"></iframe>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-6">
+                        <label>
+                            <input type="checkbox" id="enviar" name="enviar" class="js-switch" checked /> Enviar
+                            Documento por Correo
+                        </label>
+                    </div>
+                    <div class="col-md-6 d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+{% for dato in datos %}
+<div class="modal fade bs-example-modal-sm-show-editar-{{ dato.id_certificado_a }}" tabindex="-1" role="dialog"
+    aria-hidden="true">
+
+    <div class="modal-dialog">
+        <form action="editar_certificado" method="POST" id="demo-form2">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel"> Certificado {{dato.codigo}}</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="dirigido">Dirigido <span
+                                class="required">*</span></label>
+                        <div class="col-md-8 col-sm-8">
+                            <input class="form-control" id="dirigido" name="dirigido" value="{{dato.dirigido}}"></input>
+                            <input class="form-control" type="hidden" id="id_certificado" name="id_certificado" value="{{dato.id_certificado_a}}"></input>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="gestion">
+                            Gestión del Certificado <span class="required">*</span>
+                        </label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="gestion" class="form-control" type="number" name="gestion" 
+                                   placeholder="Gestión del certificado" min="1990" max="2050" required value="{{dato.gestion}}">
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="emitido">Emitido por:<span
+                                class="required">*</span>
+                        </label>
+                        <div class="col-md-8 col-sm-8 ">
+                            <input class="form-control" id="emitido" name="emitido" value="{{dato.emitido}}"></input>
+                        </div>
+
+
+                    </div>
+
+                   
+                    <div class="item form-group">
+                        <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">Correo<span
+                                class="required">*</span></label>
+                        <div class="col-md-8 col-sm-8">
+                            <input id="email" class="form-control" type="email" name="email"
+                                value="{{dato.correo}}">
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">Referencia<span
+                                class="required">*</span></label>
+                        <div class="col-md-8 col-sm-8 ">
+                            <select id="referencia" name="referencia" class="form-control" required>
+                                <option value="{{dato.referencia}}">{{dato.referencia}}</option>
+                                <option value="Certificado de Trabajo">Certificado de Trabajo</option>
+                                <option value="Certificado de Pasantia">Certificado de Pasantia</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">Usuario<span
+                                class="required">*</span></label>
+                        <div class="col-md-8 col-sm-8 ">
+                            <input id="usuario" class="form-control" type="text" name="usuario" readonly
+                                value="{{ user.first_name }} {{ user.last_name }}">
+                            <input id="id_usuario" class="form-control" type="hidden" name="id_usuario" readonly
+                                value="{{ user.id }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endfor %}
+
+
+{% for dato in datos %}
+<div class="modal fade bs-example-modal-sm-show-{{ dato.id_certificado_a }}" tabindex="-1" role="dialog"
+    aria-hidden="true">
+
+    <div class="modal-dialog ">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form action="eliminar_certificado" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="text-center">
+                        <li class="fa fa-check-square-o fa-4x"> </li>
+                    </div>
+                    <input type="hidden" name="activo" id="activo" value="{{dato.activo}}">
+                    <input type="hidden" name="id_certificado" id="id_certificado" value="{{dato.id_certificado_a}}">
+
+
+                    <br />
+                    <h5 class="text-center">Una vez eliminado este certificado nunca podra volverlo a recuperar</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Aceptar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+
+    var testPdfUrl = "{% static 'img/test.pdf' %}";
+
+    document.querySelectorAll("input[type='file']").forEach(function (input) {
+        input.addEventListener("change", function (event) {
+            var file = event.target.files[0];
+            var id = event.target.id.split('_')[1];
+            var iframe = document.getElementById("vista_" + id);
+            if (file && file.type === "application/pdf") {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    iframe.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                iframe.src = testPdfUrl;
+                alert("Por favor, selecciona un archivo PDF.");
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectDirigido = document.getElementById('dirigido');
+        const emailInput = document.getElementById('email');
+
+ 
+        selectDirigido.addEventListener('change', function () {
+            const selectedOption = selectDirigido.options[selectDirigido.selectedIndex];
+            const email = selectedOption ? selectedOption.getAttribute('data-email') : '';
+            emailInput.value = email;
+        });
+    });
+
+   
+</script>
+
+{% endblock %}
