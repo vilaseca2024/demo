@@ -281,7 +281,12 @@
                   <a class="dropdown-item"  href="javascript:;">
                     <span class="fa fa-question-circle  mt-1 pull-right"> </span>
                     Ayuda</a>
-                    <a class="dropdown-item"  href="logout/"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesion</a>
+                    <a class="dropdown-item" onclick="document.getElementById('logout-form').submit();"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesion
+                      <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    </a>
+                  
                   </div>
                 </li>
 
