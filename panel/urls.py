@@ -211,11 +211,12 @@ urlpatterns = [
     path('editar_datos_oficina', views.editar_datos_oficina, name='editar_datos_oficina'),
     path('agregar_backup_sistema', views.agregar_backup_sistema, name='agregar_backup_sistema'),
     path('subir_archivo_sistema', views.subir_archivo_sistema, name='subir_archivo_sistema'),
-    path('subir_archivo_sistema', views.subir_archivo_sistema, name='subir_archivo_sistema'),
+    path('subir_archivo_sistema_backup', views.subir_archivo_sistema_backup, name='subir_archivo_sistema_backup'),
     path('verificar_b_sistema', views.verificar_b_sistema, name='verificar_b_sistema'),
-    path('verificar_b_sistema', views.verificar_b_sistema, name='verificar_b_sistema'),
-    path('verificar_b_sistema', views.verificar_b_sistema, name='verificar_b_sistema'),
-    path('verificar_b_sistema', views.verificar_b_sistema, name='verificar_b_sistema'),
+    path('eliminar_sistema_backup', views.eliminar_sistema_backup, name='eliminar_sistema_backup'),
+    path('activar_sistema_backup', views.activar_sistema_backup, name='activar_sistema_backup'),
+    path('gastos', views.gastos, name='gastos'),
+    path('agregar_gastos_nuevos', views.agregar_gastos_nuevos, name='agregar_gastos_nuevos'),
     
  
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -2,11 +2,20 @@
 {% block content %}
 <a id="success-link" style="display:none;" onclick="new PNotify({
     title: 'Mensaje de Éxito',
-    text: 'Documento(s) subidos y guardados correctamente en el DRIVE',
+    text: 'Se registro y guardo el NUEVO USUARIO correctamente.',
     type: 'success',
     icon: 'fa fa-check-circle fa-2x',  
     styling: 'bootstrap3'
 }); ">Posi</a>
+
+<a id="error-link" style="display:none;" onclick="new PNotify({
+    title: 'Oh No!',
+    text: 'Ocurrió un error al guardar los datos.',
+    type: 'error',
+    icon: 'fa fa-exclamation-triangle fa-2x', 
+    styling: 'bootstrap3'
+});">Error</a>
+
 <div class="page-title">
     <div class="col-md-12 mx-3">
         <h3>Documentos del Personal</h3>
@@ -499,6 +508,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (document.getElementById('success-link') && '{{ request.GET.success }}') {
         document.getElementById('success-link').click();
     }  
+    if (document.getElementById('error-link') && '{{ request.GET.error }}') {
+        document.getElementById('error-link').click();
+    }
 });
    $('#agregar').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);   

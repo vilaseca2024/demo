@@ -131,7 +131,7 @@
                                     <td class="text-center">
                                         {% if dato.verificar.revisor_cambio %}
                                         <span class="badge badge-secondary">
-                                            <i class="fa fa-exclamation-triangle"></i> Verificado por: <br/>{{ dato.verificar.revisor_cambio.first_name }} {{ dato.verificar.revisor_cambio.last_name }}
+                                            <i class="fa fa-check"></i> Verificado por: <br/>{{ dato.verificar.revisor_cambio.first_name }} {{ dato.verificar.revisor_cambio.last_name }}
                                          </span>
                                         {% else %}  
                                         <a href="#" 
@@ -217,7 +217,7 @@
             {% csrf_token %}
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Agregar nueva Cuenta de Equipo</h4>
+                    <h4 class="modal-title" id="myModalLabel">Editar registro de Equipo</h4>
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
                 </div>
                 <div class="modal-body mt-2">
@@ -400,7 +400,7 @@
             {% csrf_token %}
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Actualizar Cuenta de Equipo</h4>
+                    <h4 class="modal-title" id="myModalLabel">Verificar Backup de Equipo</h4>
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
                 </div>
                 <div class="modal-body mt-2">

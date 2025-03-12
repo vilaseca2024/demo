@@ -160,7 +160,7 @@ FERNET_KEY = b'NkylMZgXlRqtSGBnE6dZEdJBRCNMfiPY0t-k2KgJNOI='
 # APPEND_SLASH = False
 
 #para EL QR DE EQUIPOS agregar url dominio
-BASE_URL_QR = "https://fcf4-200-105-158-39.ngrok-free.app"
+BASE_URL_QR = "https://c327-200-105-158-39.ngrok-free.app"
 
 #para control de usuarios envio de informes
 BASE_CORREO = 'programacionvilaseca@gmail.com'
@@ -168,7 +168,7 @@ BASE_CORREO = 'programacionvilaseca@gmail.com'
 
 # validar dominios agregar la url del 
 CSRF_TRUSTED_ORIGINS = [
-    'https://fcf4-200-105-158-39.ngrok-free.app',
+    'https://c327-200-105-158-39.ngrok-free.app',
     
      
 ]

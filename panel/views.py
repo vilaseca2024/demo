@@ -1101,10 +1101,10 @@ def cargar_documento(request):
            
 
             carpeta_documentos_id = obtener_o_crear_carpeta('SISTEMA FILE VILASECA')
-            carpeta_empleado_id = obtener_o_crear_carpeta('CERTIFICADOS TRABAJO', carpeta_padre_id=carpeta_documentos_id)
+            
             nombre_certificado =certificado_obtenido.dirigido
- 
-            archivo_guardado_nombre = f"{nombre_certificado}_{fecha_actual}"
+            carpeta_empleado_id = obtener_o_crear_carpeta(nombre_certificado, carpeta_padre_id=carpeta_documentos_id)
+            archivo_guardado_nombre = f"{'certificadoTrabajo'}_{fecha_actual}"
             temp_file_path = os.path.join(settings.MEDIA_ROOT, archivo_guardado_nombre) 
 
             with open(temp_file_path, 'wb') as f:
@@ -1161,11 +1161,9 @@ def cargar_documento(request):
             service = authenticate_google_drive()
 
             carpeta_documentos_id = obtener_o_crear_carpeta('SISTEMA FILE VILASECA')
-            carpeta_empleado_id = obtener_o_crear_carpeta('CERTIFICADOS TRABAJO', carpeta_padre_id=carpeta_documentos_id)
-
             nombre_certificado =certificado_obtenido.dirigido
- 
-            archivo_guardado_nombre = f"{nombre_certificado}_{fecha_actual}"
+            carpeta_empleado_id = obtener_o_crear_carpeta(nombre_certificado, carpeta_padre_id=carpeta_documentos_id)
+            archivo_guardado_nombre = f"{'certificadoTrabajo'}_{fecha_actual}"
             temp_file_path = os.path.join(settings.MEDIA_ROOT, archivo_guardado_nombre)
             with open(temp_file_path, 'wb') as f:
                 for chunk in documento.chunks():
@@ -4617,7 +4615,7 @@ def info_teletrabajo(request, id_datos):
 def listar_backups(request):
     datos = EstadoBackups.objects.all()
 
-    return render(request, 'backups/listar_backups.html',{'datos':datos})
+    return render(request, 'evaluacion/listar_backups.html',{'datos':datos})
 
 
 def agregar_informe_backup(request):
@@ -4738,7 +4736,7 @@ def registro_backups_nuevo(request):
             else:
                 nuevo.estado = marca_estado
 
-            nuevo.save()
+            
             fecha = datetime.strptime(fecha, "%Y-%m-%d")
           
             evento = Calendario()
@@ -4746,8 +4744,14 @@ def registro_backups_nuevo(request):
             evento.descripcion = f"Backup del equipo: {marca.nombre} por motivo de '{tipo_nuevo}' a cargo de: {marcas.first_name} {marcas.last_name}"
             evento.start = (fecha + timedelta(hours=12)).isoformat()
             evento.end = (fecha + timedelta(hours=15)).isoformat()
+            sistemas_area = Areas.objects.get(id_area = 1)
+            evento.area = sistemas_area
+            evento.usuario = marcas
             evento.color = '#9c9c9c'
+            evento.enlace = '<a href="registro_backups" class="btn btn-info mt-3"><i class="fa fa-check-square-o"></i> Completar Tarea</a>'
             evento.save()
+            nuevo.evento = evento
+            nuevo.save()
 
 
             return redirect(f"{reverse('registro_backups')}?success=true")
@@ -4898,15 +4902,20 @@ def registro_backups_verificado(request):
             verificado.obs = observaciones
             verificado.fechar_verificacion = timezone.now()
             verificado.fecha = fecha_ejecucion
+            
             usuario = User.objects.get(id = select_empleado_1)
 
             verificado.revisor_cambio = usuario
             verificado.save()
+            dato_evento = editar.evento.id
+            cambio_evento = Calendario.objects.get(id = dato_evento)
+            cambio_evento.activo = False
+            cambio_evento.save()
          
             return redirect(f"{reverse('registro_backups')}?asignar=true")
 
         except Exception as e:
-
+            print(e)
             return redirect(f"{reverse('registro_backups')}?error=true")
     return redirect('registro_backups')
 
@@ -5026,7 +5035,7 @@ def storage_info(request):
                 'id_backup_correos': '1',  
                 'activo': 1  
             })
-        return render(request, 'backups/verificar.html', {'datos': datos})
+        return render(request, 'evaluacion/verificar.html', {'datos': datos})
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
@@ -5296,15 +5305,16 @@ def calendario_emple(request):
     return render(request, 'calendario_emple.html', {'eventos': eventos})
 
 def obtener_eventos(request):
-    eventos = Calendario.objects.all()
+    eventos = Calendario.objects.filter(activo = True)
     eventos_data = [{
         'id': evento.id,
         'title': evento.title,
         'descripcion2': evento.descripcion,
         'start': evento.start.isoformat(),
         'end': evento.end.isoformat(),
-        
+        'activo': evento.activo,
         'color': evento.color,
+        'enlace': evento.enlace,
     } for evento in eventos]
 
      
@@ -5346,7 +5356,8 @@ def eliminar_evento(request, event_id):
     if request.method == 'POST':
         try:
             evento = Calendario.objects.get(id=event_id)
-            evento.delete()
+            evento.activo = False
+            evento.save()
             return JsonResponse({'status': 'success', 'message': 'Evento eliminado correctamente'})
         
         except Calendario.DoesNotExist:
@@ -5775,7 +5786,81 @@ def subir_archivo_sistema(request):
             return redirect(f"{reverse('backups_correos')}?error=true")
     
     return redirect('backups_correos')
+
+
     
+def subir_archivo_sistema_backup(request):
+    if request.method == 'POST':
+        
+        id = request.POST.get('id_backup')
+        actualizar = BackupSistemas.objects.get(id_b_sistema=id)
+
+        try:
+            if request.POST.get('enlace_archivo'):
+                enlace = request.POST.get('enlace_archivo')
+                actualizar.ubicacion = enlace
+            else:
+                doc = request.FILES.get('archivo')
+
+                def obtener_o_crear_carpeta(carpeta_nombre, carpeta_padre_id=None):
+                    query = f"mimeType='application/vnd.google-apps.folder' and name='{carpeta_nombre}'"
+                    if carpeta_padre_id:
+                        query += f" and '{carpeta_padre_id}' in parents"
+                    resultados = service.files().list(q=query, fields="files(id, name)").execute()
+                    folders = resultados.get('files', [])
+
+                    if folders:
+                        return folders[0]['id']
+                    else:
+                        file_metadata = {
+                            'name': carpeta_nombre,
+                            'mimeType': 'application/vnd.google-apps.folder',
+                        }
+                        if carpeta_padre_id:
+                            file_metadata['parents'] = [carpeta_padre_id]
+
+                        carpeta = service.files().create(body=file_metadata, fields='id').execute()
+                        print(f"[DEBUG] Carpeta '{carpeta_nombre}' creada con ID: {carpeta['id']}")
+                        return carpeta['id']
+                    
+                service = authenticate_google_drive()
+                carpeta_documentos_id = obtener_o_crear_carpeta('SISTEMA VILASECA MODULO BACKUPS')
+                carpeta_empleado_id = obtener_o_crear_carpeta('BACKUPS SISTEMAS', carpeta_padre_id=carpeta_documentos_id)
+                nombre = actualizar.sistema.nombre
+                fecha_actual = timezone.now()
+                archivo_guardado_nombre = f"{nombre}_{fecha_actual.strftime('%Y%m%d_%H%M%S')}"
+                temp_file_path = os.path.join(settings.MEDIA_ROOT, archivo_guardado_nombre)
+                with open(temp_file_path, 'wb') as f:
+                    for chunk in doc.chunks(): 
+                        f.write(chunk)
+                file_metadata = {
+                    'name': archivo_guardado_nombre,
+                    'parents': [carpeta_empleado_id]
+                }
+                media = MediaFileUpload(temp_file_path, mimetype=doc.content_type)
+                file_drive = service.files().create(
+                    body=file_metadata,
+                    media_body=media,
+                    fields='id'
+                ).execute()
+                print(f"[DEBUG] Archivo subido a Google Drive con ID: {file_drive['id']}")
+                ruta_final = f"https://drive.google.com/file/d/{file_drive['id']}/view"
+                def eliminar_archivo():
+                    try:
+                        os.remove(temp_file_path)
+                        print(f"[DEBUG] Archivo temporal {temp_file_path} eliminado.")
+                    except Exception as e:
+                        print(f"[ERROR] No se pudo eliminar el archivo temporal {temp_file_path}. Error: {str(e)}")
+                Timer(300, eliminar_archivo).start()
+                actualizar.ubicacion = ruta_final
+       
+            actualizar.save()
+            return redirect(f"{reverse('backups_sistemas')}?subir=true")
+        except Exception as e:
+            print(e)
+            return redirect(f"{reverse('backups_sistemas')}?error=true")
+    
+    return redirect('backups_sistemas')
  
 def verificar_b_sistema(request):
     if request.method == 'POST':
@@ -5786,7 +5871,7 @@ def verificar_b_sistema(request):
             disco = request.POST.get('numero_disco_verificar')
             mdisco = DiscoBackups.objects.get(id_disco = disco)
             observaciones_verificar = request.POST.get('observaciones_verificar')
-            verificar = BackupSistemas.objects.get(id_b_verificar = id_d_verificar)
+            verificar = BackupSistemas.objects.get(id_b_sistema = id_d_verificar)
             verificar.asignado = marca
             verificar.disco_verificado = mdisco.numero
             verificar.fecha_verificada = timezone.now()
@@ -5795,6 +5880,144 @@ def verificar_b_sistema(request):
             return redirect(f"{reverse(backups_sistemas)}?verificar=true")
 
         except Exception as e:
+            print(e)
             return redirect(f"{reverse(backups_sistemas)}?error=true")
     
     return redirect(backups_sistemas) 
+
+
+    
+def eliminar_sistema_backup(request):
+    if request.method == 'POST':
+        try:
+            id = request.POST.get('id_eliminar')
+            actualizar = BackupSistemas.objects.get(id_b_sistema=id)
+            actualizar.activo = False
+            actualizar.save()
+            return redirect(f"{reverse(backups_sistemas)}?desactivar=true")
+
+        except Exception as e:
+            print(e)
+            return redirect(f"{reverse(backups_sistemas)}?error=true")
+    
+    return redirect(backups_sistemas)   
+
+
+def activar_sistema_backup(request):
+    if request.method == 'POST':
+        try:
+            id = request.POST.get('id_activar')
+            actualizar = BackupSistemas.objects.get(id_b_sistema=id)
+            actualizar.activo = True
+            actualizar.save()
+            return redirect(f"{reverse(backups_sistemas)}?activar=true")
+
+        except Exception as e:
+            print(e)
+            return redirect(f"{reverse(backups_sistemas)}?error=true")
+    
+    return redirect(backups_sistemas)   
+
+
+
+def crear_pdf(request):
+    if request.method == 'POST':
+        reporte = User.objects.all()
+        return render(request, 'backups/listar_backups.html', {'reporte': reporte})
+
+def gastos(request):
+    datos = Gastos.objects.all()
+    print(datos)
+    return render(request, 'gastos/gastos.html', {'datos': datos})  
+
+
+def agregar_gastos_nuevos(request):
+    if request.method == 'POST':
+        detalle = request.POST.get('detalle')
+        costo = request.POST.get('costo')
+        fecha = request.POST.get('fecha')
+        factura = request.FILES.get('factura')
+        cotizacion = request.FILES.get('cotizacion')
+        observacion = request.POST.get('observacion')
+
+        nuevo = Gastos()
+        nuevo.detalle = detalle
+        nuevo.precio = costo
+        nuevo.fecha_realizada = fecha
+        nuevo.observaciones = observacion
+        def obtener_o_crear_carpeta(carpeta_nombre, carpeta_padre_id=None):
+            query = f"mimeType='application/vnd.google-apps.folder' and name='{carpeta_nombre}'"
+            if carpeta_padre_id:
+                query += f" and '{carpeta_padre_id}' in parents"
+            resultados = service.files().list(q=query, fields="files(id, name)").execute()
+            folders = resultados.get('files', [])
+            if folders:
+                return folders[0]['id']
+            else:
+                file_metadata = {
+                    'name': carpeta_nombre,
+                    'mimeType': 'application/vnd.google-apps.folder',
+                }
+                if carpeta_padre_id:
+                    file_metadata['parents'] = [carpeta_padre_id]
+
+                carpeta = service.files().create(body=file_metadata, fields='id').execute()
+                print(f"[DEBUG] Carpeta '{carpeta_nombre}' creada con ID: {carpeta['id']}")
+                return carpeta['id']
+
+        service = authenticate_google_drive()
+        carpeta_documentos_id = obtener_o_crear_carpeta('SISTEMA VILASECA PRESUPUESTO')
+        carpeta_empleado_id = obtener_o_crear_carpeta('GASTOS DE ACTUALIZACION', carpeta_padre_id=carpeta_documentos_id)
+        nombre = detalle
+        fecha_actual = timezone.now()
+        archivo_guardado_nombre_cotizacion = f"{nombre}_cotizacion_{fecha_actual.strftime('%Y%m%d_%H%M%S')}"
+        temp_file_path_cotizacion = os.path.join(settings.MEDIA_ROOT, archivo_guardado_nombre_cotizacion)
+        with open(temp_file_path_cotizacion, 'wb') as f:
+            for chunk in cotizacion.chunks():
+                f.write(chunk)
+        file_metadata_cotizacion = {
+            'name': archivo_guardado_nombre_cotizacion,
+            'parents': [carpeta_empleado_id]
+        }
+        media_cotizacion = MediaFileUpload(temp_file_path_cotizacion, mimetype=cotizacion.content_type)
+        file_drive_cotizacion = service.files().create(
+            body=file_metadata_cotizacion,
+            media_body=media_cotizacion,
+            fields='id'
+        ).execute()
+        print(f"[DEBUG] Cotización subida a Google Drive con ID: {file_drive_cotizacion['id']}")
+        ruta_final_cotizacion = f"https://drive.google.com/file/d/{file_drive_cotizacion['id']}/view"
+        archivo_guardado_nombre_factura = f"{nombre}_factura_{fecha_actual.strftime('%Y%m%d_%H%M%S')}"
+        temp_file_path_factura = os.path.join(settings.MEDIA_ROOT, archivo_guardado_nombre_factura)
+        with open(temp_file_path_factura, 'wb') as f:
+            for chunk in factura.chunks():
+                f.write(chunk)
+        file_metadata_factura = {
+            'name': archivo_guardado_nombre_factura,
+            'parents': [carpeta_empleado_id]
+        }
+        media_factura = MediaFileUpload(temp_file_path_factura, mimetype=factura.content_type)
+        file_drive_factura = service.files().create(
+            body=file_metadata_factura,
+            media_body=media_factura,
+            fields='id'
+        ).execute()
+        print(f"[DEBUG] Factura subida a Google Drive con ID: {file_drive_factura['id']}")
+        ruta_final_factura = f"https://drive.google.com/file/d/{file_drive_factura['id']}/view"
+        def eliminar_archivo():
+            try:
+                os.remove(temp_file_path_cotizacion)
+                os.remove(temp_file_path_factura)
+                print(f"[DEBUG] Archivos temporales eliminados.")
+            except Exception as e:
+                print(f"[ERROR] No se pudieron eliminar los archivos temporales. Error: {str(e)}")
+
+        Timer(300, eliminar_archivo).start()
+        nuevo.cotizacion = ruta_final_cotizacion
+        nuevo.factura = ruta_final_factura
+        nuevo.save()
+
+        return redirect(gastos)
+
+    
+

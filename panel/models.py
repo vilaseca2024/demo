@@ -46,6 +46,25 @@ class Oficina(models.Model):
     class Meta:
         db_table = 'oficinas'
 
+
+
+
+class Calendario(models.Model):
+    title = models.CharField(max_length=200)   
+    descripcion = models.TextField(blank=True, null=True)   
+    start = models.DateTimeField()   
+    end = models.DateTimeField()  
+    tipo = models.CharField(max_length=20, null=True)
+    color = models.CharField(max_length=7, default='#00aae4') 
+    area = models.ForeignKey(Areas, on_delete=models.CASCADE, null=True, blank=True)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    estado = models.BooleanField(default=True, null=True)
+    activo = models.BooleanField(default=True, null=True)
+    enlace = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return self.title
+
 class BajaCorreosUsuarios(models.Model):
     id_asignacion = models.AutoField(primary_key=True)
     correo = models.CharField(max_length=50, null=True)
@@ -896,6 +915,7 @@ class Backups(models.Model):
     observaciones = models.CharField(max_length=200, null=True)
     verificar = models.ForeignKey(VerificacionBackups, on_delete=models.CASCADE, null=True, blank=True) 
     tipo_backup = models.CharField(max_length=50, null=True)
+    evento = models.ForeignKey(Calendario, on_delete=models.CASCADE, null=True, blank=True) 
     class Meta:
         db_table = 'backup'
 
@@ -937,21 +957,6 @@ class BackupsCorreos(models.Model):
         db_table = 'backup_correo'
 
 
-class Calendario(models.Model):
-    title = models.CharField(max_length=200)   
-    descripcion = models.TextField(blank=True, null=True)   
-    start = models.DateTimeField()   
-    end = models.DateTimeField()  
-    tipo = models.CharField(max_length=20, null=True)
-    color = models.CharField(max_length=7, default='#00aae4') 
-    area = models.CharField(max_length=20, null=True)
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    estado = models.BooleanField(default=True, null=True)
-    activo = models.BooleanField(default=True, null=True)
-
-    def __str__(self):
-        return self.title
-
 class Mantenimientos(models.Model):
     id_mantenimiento = models.AutoField(primary_key=True)
     fecha_planificada = models.DateTimeField(null=True)
@@ -988,8 +993,26 @@ class BackupSistemas(models.Model):
     estado = models.CharField(max_length=20, null=True)
     activo = models.BooleanField(default=True)
     periodo = models.CharField(max_length=20, null=True)
+    ubicacion = models.CharField(max_length=200, null=True)
     class Meta:
         db_table = 'backup_sistema'
 
 
  
+class Gastos(models.Model):
+    id_gasto = models.AutoField(primary_key=True)
+    fecha_planificada = models.DateTimeField(null=True)
+    fecha_realizada = models.DateTimeField(null=True)
+    fecha_verificada = models.DateTimeField(null=True)
+    observaciones = models.CharField(max_length=250, null=True)
+    encargado = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) 
+    oficina = models.ForeignKey(Oficina, on_delete=models.CASCADE, null=True, blank=True) 
+    detalle = models.CharField(max_length=100, null=True)
+    precio = models.FloatField(null=True)
+    factura = models.CharField(max_length=200, null=True)
+    cotizacion = models.CharField(max_length=200, null=True)
+    activo = models.BooleanField(default=True)
+ 
+    class Meta:
+        db_table = 'gastos'
+

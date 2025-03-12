@@ -137,8 +137,13 @@
                                 <input type="text" class="form-control" id="end_date2" name="end_date2" readonly>
                             </div>
                         </div>
+
                     </form>
+                    <div id="apuntes" name="apuntes" class="text-right">
+                        
+                    </div>
                 </div>
+               
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default antoclose2" data-dismiss="modal">Cancelar</button>
@@ -189,6 +194,8 @@
             eventClick: function(event) {
                 $('#title2').val(event.title);
                 $('#descr2').val(event.descripcion2);
+                document.getElementById('apuntes').innerHTML = event.enlace;
+
                 $('#start_date2').val(event.start.format('YYYY-MM-DD'));
                 $('#end_date2').val(event.end.format('YYYY-MM-DD'));
                 $('#CalenderModalEdit').modal('show');
@@ -197,7 +204,7 @@
                     const descr = $('#descr2').val();
                     const start = event.start.format();
                     const end = event.end.format();
-
+                    
                     $.ajax({
                         type: "POST",
                         url: `/api/eventos/editar/${event.id}/`,
@@ -248,6 +255,7 @@
                                 end: evento.end,
                                 descripcion2: evento.descripcion2,
                                 color: evento.color,
+                                enlace: evento.enlace,
                             };
                         });
                         callback(events);
