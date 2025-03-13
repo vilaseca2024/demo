@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-&2r20tt5*7+)w(g&y*ls81!=6#0o_ox+ynsp7gy223m5nz@^2t
 DEBUG = True
 
 # agregar entre comillas el valor del dominio
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['code2c.com/demo','www.code2c.com','code2c.com','46.202.149.244']
 
 
 # Application definition
@@ -120,15 +120,15 @@ TIME_ZONE = 'America/La_Paz'
 USE_I18N = True
 USE_TZ = False
 
-
+import os
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/')]
 
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
-import os
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
@@ -139,6 +139,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGOUT_REDIRECT_URL = '/'
 
 LOGIN_URL = '/session/'
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com' 
@@ -157,7 +158,7 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyCh7gKB66uvFfsnrQ-R66wFxGVNE2JL6H4'
  
 FERNET_KEY = b'NkylMZgXlRqtSGBnE6dZEdJBRCNMfiPY0t-k2KgJNOI='
 
-# APPEND_SLASH = False
+APPEND_SLASH = False
 
 #para EL QR DE EQUIPOS agregar url dominio
 BASE_URL_QR = "https://c1fb-200-105-158-39.ngrok-free.app"
