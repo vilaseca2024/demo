@@ -998,12 +998,7 @@ def agregar_documentos_file(request):
                     file_personal = None
 
                 ruta_final = f"https://drive.google.com/file/d/{file_drive['id']}/view"
-
-                # ruta_final = f"https://drive.google.com/uc?id={file_drive['id']}"
-
-                # ruta_final = f"https://drive.google.com/thumbnail?id={file_drive['id']}"
-              
-                
+ 
                 if file_personal:
                     modelo.objects.create(
                         file=file_personal,
@@ -3949,38 +3944,50 @@ def obtener_o_crear_carpeta(carpeta_nombre, carpeta_padre_id=None):
         raise Exception(f"Error al obtener o crear la carpeta en Drive: {str(e)}")
 
  
-
 def guardar_imagen_drive(image_data, image_filename):
     try:
         image_file = base64.b64decode(image_data)
         temp_file_path = os.path.join(settings.MEDIA_ROOT, image_filename)
         with open(temp_file_path, 'wb') as f:
             f.write(image_file)
+        
         service = authenticate_google_drive()
-        carpeta_documentos_id = obtener_o_crear_carpeta('VILASECA - SOPORTE TECNICO')
+
+        # Definir el ID de la carpeta de forma consistente con las otras funciones
+        carpeta_documentos_id = '1_bTuR_39u-9xhOiPGuqAgzO8rcCdvVFE'  # El ID de la carpeta en Google Drive
+
+        # Si quieres usar la función obtener_o_crear_carpeta, pasa la variable 'carpeta_documentos_id'
+        carpeta_documentos_id = obtener_o_crear_carpeta('VILASECA - SOPORTE TECNICO', carpeta_padre_id=carpeta_documentos_id)
+
         file_metadata = {
             'name': image_filename,
             'parents': [carpeta_documentos_id]
         }
+
         media = MediaFileUpload(temp_file_path, mimetype='image/jpeg')
         file_drive = service.files().create(
             body=file_metadata,
             media_body=media,
             fields='id'
         ).execute()
+
         ruta_final = f"https://drive.google.com/file/d/{file_drive['id']}/view"
+
+        # Función para eliminar el archivo temporal después de 5 minutos
         def eliminar_archivo():
             try:
                 os.remove(temp_file_path)  
             except Exception as e:
                 print(f"[ERROR] No se pudo eliminar el archivo temporal {temp_file_path}. Error: {str(e)}")
         
-        Timer(300, eliminar_archivo).start() 
+        Timer(300, eliminar_archivo).start()  # Eliminar archivo tras 5 minutos
 
         return ruta_final  
 
     except Exception as e:
         raise Exception(f"Error al procesar la imagen: {str(e)}")
+
+
 
 
 def guardar_mensaje(request):
@@ -6020,4 +6027,4 @@ def agregar_gastos_nuevos(request):
         return redirect(gastos)
 
     
-
+  
